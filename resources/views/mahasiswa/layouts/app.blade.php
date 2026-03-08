@@ -217,10 +217,10 @@
                         <ul class="dropdown-menu dropdown-menu-end shadow-lg border-0 rounded-4 mt-2 p-2" style="min-width: 220px;">
                             <li class="px-3 py-2">
                                 <span class="d-block fw-bold text-dark">{{ $user->nama }}</span>
-                                <span class="d-block small text-muted">{{ $user->nim }}</span>
+                                <span class="d-block small text-muted">NIM: {{ $user->nim }}</span>
                             </li>
                             <li><hr class="dropdown-divider my-2"></li>
-                            <li><a class="dropdown-item rounded-3 py-2 fw-medium text-secondary" href="#"><i class="bi bi-person-gear me-2"></i> Pengaturan Akun</a></li>
+                            <li><a class="dropdown-item rounded-3 py-2 fw-medium text-secondary" href="{{ route('mahasiswa.profile.index') }}"><i class="bi bi-person-gear me-2"></i> Pengaturan Akun</a></li>
                             <li>
                                 <form action="{{ route('logout') }}" method="POST" class="m-0 p-0">
                                     @csrf
