@@ -115,9 +115,6 @@ Route::middleware(['role:dosen'])
                 Route::patch('/periode/{id}/toggle', [PeriodeController::class, 'toggle'])->name('periode.toggle');
                 Route::delete('/periode/{id}', [PeriodeController::class, 'destroy'])->name('periode.destroy');
 
-                // Assign Pembimbing 2
-                Route::get('/assign-pbb2', [AssignController::class, 'index'])->name('assign.index');
-                Route::put('/assign-pbb2/{id}', [AssignController::class, 'update'])->name('assign.update');
         });
 
 });

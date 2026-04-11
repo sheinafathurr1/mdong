@@ -100,7 +100,7 @@
                                     {{ \Carbon\Carbon::parse($app->tanggal_response)->format('d M Y, H:i') }}
                                 </td>
                                 <td class="px-4 py-3 text-center">
-                                    @if($app->status === 'APPROVED-PBB1' || $app->status === 'APPROVED-FULL')
+                                    @if($app->status === 'APPROVED')
                                         <span class="badge bg-success-subtle border border-success text-success px-3 py-2 rounded-pill fw-bold">Disetujui</span>
                                     @else
                                         <span class="badge bg-danger-subtle border border-danger text-danger px-3 py-2 rounded-pill fw-bold">Ditolak</span>

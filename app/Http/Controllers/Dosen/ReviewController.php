@@ -28,7 +28,7 @@ class ReviewController extends Controller
         // Aplikasi yang sudah diproses (Riwayat)
         $riwayat = Application::with(['mahasiswa', 'topik'])
             ->whereIn('topik_id', $topikIds)
-            ->whereIn('status', ['APPROVED-PBB1', 'APPROVED-FULL', 'REJECTED'])
+            ->whereIn('status', ['APPROVED', 'REJECTED'])
             ->orderBy('tanggal_response', 'desc')
             ->get();
 
@@ -60,14 +60,15 @@ class ReviewController extends Controller
             abort(403);
         }
 
+        // 1. Validasi diubah menjadi APPROVED
         $request->validate([
-            'status' => 'required|in:APPROVED-PBB1,REJECTED'
+            'status' => 'required|in:APPROVED,REJECTED'
         ]);
 
         $statusBaru = $request->status;
 
-        // Jika Dosen menekan Approve, cek dulu apakah kuota masih ada
-        if ($statusBaru === 'APPROVED-PBB1') {
+        // 2. Pengecekan IF diubah menjadi APPROVED
+        if ($statusBaru === 'APPROVED') {
             if ($application->topik->limit_applied >= $application->topik->limit_bimbingan) {
                 return back()->with('error', 'Gagal menyetujui! Kuota bimbingan topik ini sudah penuh.');
             }
@@ -81,7 +82,8 @@ class ReviewController extends Controller
             'tanggal_response' => now(),
         ]);
 
-        $pesan = $statusBaru === 'APPROVED-PBB1' ? 'Aplikasi mahasiswa berhasil disetujui!' : 'Aplikasi mahasiswa telah ditolak.';
+        // 3. Pesan sukses
+        $pesan = $statusBaru === 'APPROVED' ? 'Aplikasi mahasiswa berhasil disetujui!' : 'Aplikasi mahasiswa telah ditolak.';
 
         return redirect()->route('dosen.review.index')->with('success', $pesan);
     }

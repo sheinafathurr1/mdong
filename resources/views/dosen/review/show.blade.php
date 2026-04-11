@@ -52,7 +52,7 @@
                         @method('PUT')
                         
                         <div class="d-grid gap-3">
-                            <button type="submit" name="status" value="APPROVED-PBB1" class="btn btn-dark py-3 rounded-pill fw-bold shadow-sm" onclick="return confirm('Setujui mahasiswa ini menjadi bimbingan Anda? Kuota akan terpotong 1.')">
+                            <button type="submit" name="status" value="APPROVED" class="btn btn-dark py-3 rounded-pill fw-bold shadow-sm" onclick="return confirm('Setujui mahasiswa ini menjadi bimbingan Anda? Kuota akan terpotong 1.')">
                                 <i class="bi bi-check-circle-fill me-2"></i> Terima Aplikasi
                             </button>
                             

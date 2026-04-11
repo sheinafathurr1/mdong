@@ -4,215 +4,170 @@
 
 @section('content')
 <style>
-    .stat-card { transition: all 0.3s ease; border: 1px solid #e5e7eb; position: relative; overflow: hidden; }
-    .stat-card:hover { transform: translateY(-5px); box-shadow: 0 10px 20px rgba(0,0,0,0.05); }
-    .welcome-banner { background: linear-gradient(135deg, #0f172a 0%, #334155 100%); color: white; border-radius: 20px; }
-    .status-badge { padding: 6px 16px; border-radius: 50px; font-weight: 700; font-size: 0.75rem; text-transform: uppercase; }
+    /* Styling Banner & Card */
+    .welcome-banner { background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); color: white; border-radius: 24px; position: relative; overflow: hidden; box-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.1); }
+    .welcome-banner::after { content: ''; position: absolute; right: -5%; top: -20%; width: 300px; height: 300px; background: radial-gradient(circle, rgba(255,255,255,0.05) 0%, transparent 70%); border-radius: 50%; pointer-events: none; }
+    
+    .dashboard-card { transition: all 0.3s ease; border: 1px solid #e2e8f0; border-radius: 20px; background: #ffffff; overflow: hidden; }
+    .dashboard-card:hover { transform: translateY(-3px); box-shadow: 0 15px 30px -5px rgba(0,0,0,0.05); border-color: #cbd5e1; }
+    
+    .icon-box-lg { width: 64px; height: 64px; border-radius: 18px; display: flex; align-items: center; justify-content: center; font-size: 1.8rem; flex-shrink: 0; }
+
+    /* Alert Status Canggih */
+    .status-alert { border-radius: 20px; border-left: 6px solid; padding: 1.5rem 2rem; position: relative; overflow: hidden; }
+    .status-alert::before { content: ''; position: absolute; right: -20px; top: -20px; width: 100px; height: 100px; border-radius: 50%; opacity: 0.1; }
+    
+    .status-applied { background-color: #fffbeb; border-color: #f59e0b; }
+    .status-applied::before { background-color: #f59e0b; }
+    .status-applied .icon-bg { background-color: rgba(245, 158, 11, 0.2); color: #d97706; }
+    
+    .status-approved { background-color: #f0fdf4; border-color: #10b981; }
+    .status-approved::before { background-color: #10b981; }
+    .status-approved .icon-bg { background-color: rgba(16, 185, 129, 0.2); color: #059669; }
+    
+    .status-rejected { background-color: #fef2f2; border-color: #ef4444; }
+    .status-rejected::before { background-color: #ef4444; }
+    .status-rejected .icon-bg { background-color: rgba(239, 68, 68, 0.2); color: #dc2626; }
 </style>
 
-<div class="mb-4">
-    <h3 class="fw-extrabold mb-0">Overview Dashboard</h3>
-</div>
-
-<div class="welcome-banner p-5 mb-5 shadow-sm">
-    <div class="row align-items-center">
+<div class="welcome-banner p-4 p-md-5 mb-4 mb-xl-5">
+    <div class="row align-items-center position-relative" style="z-index: 2;">
         <div class="col-md-8">
-            <h2 class="fw-bold mb-2">Hai, {{ explode(' ', $user->nama)[0] }}! 👋</h2>
-            <p class="text-white-50 fs-5 mb-4">Pastikan portofoliomu sudah lengkap sebelum mendaftar ke topik dosen pilihanmu.</p>
-            <div class="d-flex gap-2">
-                <a href="{{ route('mahasiswa.project.index') }}" class="btn btn-light fw-bold px-4 py-2 rounded-pill shadow-sm">
-                    Lihat Portofolio
-                </a>
-                <a href="{{ route('mahasiswa.topik.index') }}" class="btn btn-outline-light fw-bold px-4 py-2 rounded-pill">
-                    Cari Topik TA
-                </a>
-            </div>
+            <span class="badge bg-white text-dark px-3 py-2 rounded-pill fw-bold shadow-sm mb-3" style="font-size: 0.7rem; letter-spacing: 1px;">PORTAL MAHASISWA</span>
+            <h2 class="fw-black mb-2">Halo, {{ explode(' ', $user->nama)[0] }}! 🚀</h2>
+            <p class="text-white-50 fs-6 mb-0" style="max-width: 500px; line-height: 1.6;">
+                Persiapkan portofolio karya terbaikmu, temukan topik penelitian yang menantang, dan raih persetujuan Dosen Pembimbing untuk memulai Tugas Akhir.
+            </p>
         </div>
         <div class="col-md-4 text-end d-none d-md-block">
-            <i class="bi bi-person-workspace text-white-50" style="font-size: 7rem; opacity: 0.3;"></i>
+            <i class="bi bi-mortarboard text-white-50" style="font-size: 8rem; opacity: 0.2;"></i>
         </div>
     </div>
 </div>
 
-<div class="row g-4">
-    <div class="col-md-4">
-        <div class="card stat-card rounded-4 h-100 bg-white">
-            <div class="card-body p-4">
-                <div class="d-flex justify-content-between align-items-start mb-3">
-                    <div class="bg-dark text-white rounded-3 p-2">
-                        <i class="bi bi-collection-fill fs-4"></i>
-                    </div>
-                </div>
-                <div class="text-muted small fw-bold text-uppercase mb-1">Portofolio Saya</div>
-                <div class="fs-2 fw-bold text-dark">{{ $totalProject }} <span class="fs-5 fw-medium text-muted">Proyek</span></div>
-                
-                @if(!$aplikasi || $aplikasi->status === 'REJECTED')
-                    <a href="{{ route('mahasiswa.project.create') }}" class="text-dark small fw-bold text-decoration-none mt-2 d-inline-block">
-                        Tambah Proyek <i class="bi bi-plus-circle ms-1"></i>
-                    </a>
-                @else
-                    <span class="text-muted small fw-medium mt-2 d-inline-block">
-                        <i class="bi bi-lock-fill me-1"></i> Portofolio Terkunci
-                    </span>
-                @endif
+@if(!$latestApp)
+    <div class="card dashboard-card border-dashed mb-5 p-4 p-md-5 text-center bg-light border-0" style="border: 2px dashed #cbd5e1 !important;">
+        <div class="bg-white rounded-circle d-inline-flex align-items-center justify-content-center mb-4 shadow-sm" style="width: 80px; height: 80px;">
+            <i class="bi bi-rocket-takeoff fs-1 text-dark"></i>
+        </div>
+        <h4 class="fw-bold text-dark mb-2">Mulai Perjalanan Pra-TA Anda</h4>
+        <p class="text-muted mx-auto mb-4" style="max-width: 500px;">
+            Anda belum memiliki pengajuan topik yang aktif. Langkah pertama adalah menyusun portofolio karya, lalu mulai mengeksplorasi topik yang ditawarkan oleh Dosen Prodi.
+        </p>
+        <div class="d-flex justify-content-center gap-3 flex-wrap">
+            <a href="{{ route('mahasiswa.project.create') }}" class="btn btn-outline-dark rounded-pill px-4 py-2 fw-bold border-2">
+                <i class="bi bi-folder-plus me-2"></i> Isi Portofolio
+            </a>
+            <a href="{{ route('mahasiswa.topik.index') }}" class="btn btn-dark rounded-pill px-4 py-2 fw-bold shadow-sm">
+                Cari Topik Interest <i class="bi bi-arrow-right ms-2"></i>
+            </a>
+        </div>
+    </div>
+
+@elseif($latestApp->status == 'APPLIED')
+    <div class="status-alert status-applied mb-5 shadow-sm">
+        <div class="d-flex flex-column flex-md-row align-items-md-center gap-4">
+            <div class="icon-bg rounded-circle d-flex align-items-center justify-content-center flex-shrink-0" style="width: 70px; height: 70px;">
+                <span class="spinner-border spinner-border-sm fs-4" style="width: 2rem; height: 2rem; border-width: 0.25em;" role="status"></span>
+            </div>
+            <div>
+                <h5 class="fw-black text-dark mb-1">Pengajuan Sedang Direview</h5>
+                <p class="text-dark opacity-75 mb-0 fw-medium">
+                    Portofolio Anda untuk topik <strong>"{{ $latestApp->topik->nama_topik }}"</strong> sedang dievaluasi oleh dosen terkait. Harap bersabar menunggu hasil keputusan.
+                </p>
+            </div>
+            <div class="ms-md-auto mt-3 mt-md-0">
+                <a href="{{ route('mahasiswa.application.status') }}" class="btn btn-dark btn-sm rounded-pill px-4 py-2 fw-bold shadow-sm text-nowrap">Cek Detail Status</a>
             </div>
         </div>
     </div>
 
-    <div class="col-md-8">
-        <div class="card stat-card rounded-4 h-100 bg-white border-0 shadow-sm">
-            <div class="card-body p-4">
-                <div class="text-muted small fw-bold text-uppercase mb-3 d-flex justify-content-between">
-                    <span>Status Pengajuan Terkini</span>
-                    @if($aplikasi)
-                        <a href="{{ route('mahasiswa.application.status') }}" class="text-dark text-decoration-none"><i class="bi bi-box-arrow-up-right me-1"></i> Lacak Status</a>
-                    @endif
-                </div>
-                
-                @if($aplikasi)
-                    @if($aplikasi->status === 'APPROVED-FULL')
-                        <div class="alert alert-success bg-success-subtle border-success border-2 p-4 rounded-4 mb-0">
-                            <div class="d-flex align-items-center mb-3">
-                                <i class="bi bi-check-circle-fill fs-3 text-success me-3"></i>
-                                <div>
-                                    <h5 class="fw-bold text-dark mb-0">Selamat! Pra-TA Disetujui</h5>
-                                    <span class="small text-success fw-bold">Status: APPROVED-FULL</span>
-                                </div>
-                            </div>
-                            <div class="bg-white p-3 rounded-3 border">
-                                <div class="small text-muted text-uppercase fw-bold mb-1" style="font-size: 0.7rem;">Topik Penelitian</div>
-                                <div class="fw-bold text-dark mb-3">{{ $aplikasi->topik->nama_topik }}</div>
-                                
-                                <div class="row g-3">
-                                    <div class="col-md-6">
-                                        <div class="small text-muted text-uppercase fw-bold mb-1" style="font-size: 0.7rem;">Pembimbing 1</div>
-                                        <div class="fw-medium text-dark"><i class="bi bi-person-fill me-1 text-muted"></i> {{ $aplikasi->topik->dosen->nama }}</div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <div class="small text-muted text-uppercase fw-bold mb-1" style="font-size: 0.7rem;">Pembimbing 2</div>
-                                        <div class="fw-medium text-dark"><i class="bi bi-person-check-fill me-1 text-muted"></i> {{ $aplikasi->pembimbing2->nama ?? 'Belum Diatur' }}</div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                    @else
-                        <div class="d-flex align-items-center justify-content-between p-3 bg-light rounded-4 border">
-                            <div>
-                                <div class="fw-bold text-dark">{{ $aplikasi->topik->nama_topik }}</div>
-                                <div class="small text-muted">Dosen: {{ $aplikasi->topik->dosen->nama }}</div>
-                            </div>
-                            <div class="text-end">
-                                @php
-                                    $statusClasses = [
-                                        'DRAFT' => 'bg-secondary text-white',
-                                        'APPLIED' => 'bg-primary text-white',
-                                        'APPROVED-PBB1' => 'bg-info text-dark',
-                                        'REJECTED' => 'bg-danger text-white'
-                                    ];
-                                @endphp
-                                <span class="badge {{ $statusClasses[$aplikasi->status] }} px-3 py-2 rounded-pill fw-bold shadow-sm">
-                                    {{ $aplikasi->status }}
-                                </span>
-                                @if($aplikasi->status === 'APPROVED-PBB1')
-                                    <div class="small text-muted mt-1" style="font-size: 0.7rem;">Menunggu plotting PBB 2</div>
-                                @elseif($aplikasi->status === 'REJECTED')
-                                    <div class="small text-danger mt-1 fw-bold" style="font-size: 0.7rem;">
-                                        <a href="{{ route('mahasiswa.topik.index') }}" class="text-danger text-decoration-none">Cari Topik Lain <i class="bi bi-arrow-right"></i></a>
-                                    </div>
-                                @endif
-                            </div>
-                        </div>
-                    @endif
-
-                @else
-                    <div class="text-center py-4 bg-light rounded-4 border border-dashed">
-                        <i class="bi bi-search fs-2 text-muted mb-2 d-block"></i>
-                        <p class="text-muted mb-3 small fw-medium">Anda belum mengajukan topik pendaftaran.</p>
-                        <a href="{{ route('mahasiswa.topik.index') }}" class="btn btn-sm btn-dark px-4 py-2 rounded-pill fw-bold">Eksplorasi Topik TA</a>
-                    </div>
-                @endif
+@elseif($latestApp->status == 'APPROVED')
+    <div class="status-alert status-approved mb-5 shadow-sm">
+        <div class="d-flex flex-column flex-md-row align-items-md-center gap-4">
+            <div class="icon-bg rounded-circle d-flex align-items-center justify-content-center flex-shrink-0" style="width: 70px; height: 70px;">
+                <i class="bi bi-check-circle-fill fs-2"></i>
             </div>
-        </div>
-    </div>
-</div>
-
-{{-- <div class="row mt-4 g-4">
-    <div class="col-md-12">
-        <div class="card border-0 rounded-4 shadow-sm">
-            <div class="card-body p-4 d-flex align-items-center justify-content-between">
-                <div class="d-flex align-items-center gap-4">
-                    <div class="bg-light p-3 rounded-circle text-dark">
-                        <i class="bi bi-info-lg fs-4"></i>
-                    </div>
-                    <div>
-                        <div class="text-muted small fw-bold text-uppercase">Informasi Akademik</div>
-                        <div class="fw-bold fs-5">{{ $user->nim }} — {{ $user->program_studi }}</div>
-                    </div>
-                </div>
-                <div class="text-end d-none d-md-block">
-                    <div class="text-muted small">Kelas</div>
-                    <div class="fw-bold">{{ $user->kelas ?? '-' }}</div>
+            <div>
+                <span class="badge bg-white text-success border border-success rounded-pill px-3 py-1 mb-2 fw-bold" style="font-size: 0.7rem;">DITERIMA & FINAL</span>
+                <h5 class="fw-black text-dark mb-1">Selamat! Pembimbing Ditetapkan</h5>
+                <p class="text-dark opacity-75 mb-0 fw-medium">
+                    Anda telah resmi diterima pada topik <strong>"{{ $latestApp->topik->nama_topik }}"</strong>. Anda kini dapat mulai bimbingan Tugas Akhir.
+                </p>
+            </div>
+            <div class="ms-md-auto mt-3 mt-md-0 text-md-end">
+                <div class="small text-muted fw-bold text-uppercase tracking-wide mb-1" style="font-size: 0.65rem;">Dosen Pembimbing</div>
+                <div class="fw-bold text-dark bg-white px-3 py-2 rounded-3 border shadow-sm d-inline-block">
+                    <i class="bi bi-person-workspace me-2 text-success"></i>{{ $latestApp->dosen->nama ?? 'Dosen' }}
                 </div>
             </div>
         </div>
     </div>
-</div> --}}
 
-@if($riwayatAplikasi->count() > 0)
-<div class="row mt-4 mb-5">
-    <div class="col-md-12">
-        <div class="card border-0 rounded-4 shadow-sm overflow-hidden">
-            <div class="card-header bg-white border-bottom p-4">
-                <h6 class="fw-bold mb-0 text-dark"><i class="bi bi-clock-history me-2 text-muted"></i>Riwayat Pengajuan Topik</h6>
+@elseif($latestApp->status == 'REJECTED')
+    <div class="status-alert status-rejected mb-5 shadow-sm">
+        <div class="d-flex flex-column flex-md-row align-items-md-center gap-4">
+            <div class="icon-bg rounded-circle d-flex align-items-center justify-content-center flex-shrink-0" style="width: 70px; height: 70px;">
+                <i class="bi bi-x-circle-fill fs-2"></i>
             </div>
-            <div class="card-body p-0">
-                <div class="table-responsive">
-                    <table class="table table-hover align-middle mb-0">
-                        <thead class="bg-light text-muted small text-uppercase tracking-wide">
-                            <tr>
-                                <th class="px-4 py-3">Topik & Pembimbing 1</th>
-                                <th class="px-4 py-3">Tanggal Pengajuan</th>
-                                <th class="px-4 py-3">Tanggal Update</th>
-                                <th class="px-4 py-3 text-end">Status Akhir</th>
-                            </tr>
-                        </thead>
-                        <tbody class="border-top-0">
-                            @foreach($riwayatAplikasi as $riwayat)
-                                @php
-                                    $badgeColor = [
-                                        'DRAFT' => 'bg-secondary text-white',
-                                        'APPLIED' => 'bg-primary text-white',
-                                        'APPROVED-PBB1' => 'bg-info text-dark',
-                                        'APPROVED-FULL' => 'bg-success text-white',
-                                        'REJECTED' => 'bg-danger text-white'
-                                    ];
-                                @endphp
-                                <tr>
-                                    <td class="px-4 py-3">
-                                        <div class="fw-bold text-dark text-truncate" style="max-width: 350px;">{{ $riwayat->topik->nama_topik }}</div>
-                                        <div class="small text-muted"><i class="bi bi-person-fill me-1"></i> {{ $riwayat->topik->dosen->nama }}</div>
-                                    </td>
-                                    <td class="px-4 py-3 text-muted small fw-medium">
-                                        {{ \Carbon\Carbon::parse($riwayat->tanggal_submit)->format('d M Y') }}
-                                    </td>
-                                    <td class="px-4 py-3 text-muted small fw-medium">
-                                        {{ $riwayat->tanggal_response ? \Carbon\Carbon::parse($riwayat->tanggal_response)->format('d M Y') : '-' }}
-                                    </td>
-                                    <td class="px-4 py-3 text-end">
-                                        <span class="badge {{ $badgeColor[$riwayat->status] }} px-3 py-2 rounded-pill shadow-sm">
-                                            {{ $riwayat->status }}
-                                        </span>
-                                    </td>
-                                </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
-                </div>
+            <div>
+                <h5 class="fw-black text-dark mb-1">Pengajuan Ditolak</h5>
+                <p class="text-dark opacity-75 mb-0 fw-medium">
+                    Maaf, pengajuan Anda untuk topik <strong>"{{ $latestApp->topik->nama_topik }}"</strong> belum dapat diterima oleh dosen. Jangan menyerah, silakan mendaftar ke topik lain!
+                </p>
+            </div>
+            <div class="ms-md-auto mt-3 mt-md-0">
+                <a href="{{ route('mahasiswa.topik.index') }}" class="btn btn-danger rounded-pill px-4 py-2 fw-bold shadow-sm text-nowrap">
+                    Cari Topik Lain <i class="bi bi-arrow-right ms-2"></i>
+                </a>
             </div>
         </div>
     </div>
-</div>
 @endif
 
+<div class="row g-4 mb-4">
+    
+    <div class="col-md-6">
+        <div class="card dashboard-card h-100 p-4">
+            <div class="d-flex justify-content-between align-items-start mb-4">
+                <div class="icon-box-lg bg-light text-dark border">
+                    <i class="bi bi-folder-fill"></i>
+                </div>
+                <a href="{{ route('mahasiswa.project.index') }}" class="btn btn-sm btn-outline-secondary rounded-pill fw-bold">Kelola Karya</a>
+            </div>
+            <h5 class="fw-bold text-dark mb-1">Portofolio Saya</h5>
+            <div class="d-flex align-items-center gap-2 mb-3">
+                <h2 class="fw-black text-dark mb-0">{{ $projectCount }}</h2>
+                <span class="text-muted fw-medium">Karya Diunggah</span>
+            </div>
+            <p class="text-muted small fw-medium mb-0">
+                Portofolio ini akan dikirimkan secara anonim *(Blind Review)* saat Anda melamar sebuah topik interest.
+            </p>
+            
+            @if($projectCount == 0)
+                <div class="mt-3 pt-3 border-top">
+                    <span class="text-danger small fw-bold"><i class="bi bi-exclamation-triangle-fill me-1"></i> Portofolio masih kosong. Wajib diisi!</span>
+                </div>
+            @endif
+        </div>
+    </div>
+
+    <div class="col-md-6">
+        <div class="card dashboard-card h-100 p-4" style="background: #f8fafc;">
+            <div class="d-flex justify-content-between align-items-start mb-4">
+                <div class="icon-box-lg bg-dark text-white shadow-sm">
+                    <i class="bi bi-info-circle-fill"></i>
+                </div>
+            </div>
+            <h5 class="fw-bold text-dark mb-2">Panduan Pra-TA</h5>
+            <ul class="list-unstyled text-muted small fw-medium mb-0" style="line-height: 1.8;">
+                <li class="d-flex align-items-start mb-2"><i class="bi bi-1-circle-fill text-dark me-2 mt-1"></i> Lengkapi portofolio perancangan atau analisis.</li>
+                <li class="d-flex align-items-start mb-2"><i class="bi bi-2-circle-fill text-dark me-2 mt-1"></i> Pilih maksimal 1 (satu) topik interest dosen.</li>
+                <li class="d-flex align-items-start mb-2"><i class="bi bi-3-circle-fill text-dark me-2 mt-1"></i> Identitas Dosen disembunyikan sampai Anda diterima.</li>
+                <li class="d-flex align-items-start"><i class="bi bi-4-circle-fill text-dark me-2 mt-1"></i> Keputusan Dosen mutlak dan tidak dapat diganggu gugat.</li>
+            </ul>
+        </div>
+    </div>
+
+</div>
 @endsection

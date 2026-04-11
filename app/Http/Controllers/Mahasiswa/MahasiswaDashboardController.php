@@ -6,7 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Project;
-use App\Models\Application; // Pastikan model ini sudah ada nantinya
+use App\Models\Application; 
 
 class MahasiswaDashboardController extends Controller
 {
@@ -14,18 +14,16 @@ class MahasiswaDashboardController extends Controller
     {
         $user = Auth::guard('mahasiswa')->user();
 
-        // Menghitung total proyek portofolio mahasiswa ini
-        $totalProject = Project::where('mahasiswa_id', $user->mahasiswa_id)->count();
+        // 1. Menghitung total proyek portofolio mahasiswa ini
+        $projectCount = Project::where('mahasiswa_id', $user->mahasiswa_id)->count();
 
-        // Mengambil SEMUA riwayat aplikasi, diurutkan dari yang paling baru
-        $riwayatAplikasi = Application::where('mahasiswa_id', $user->mahasiswa_id)
-                    ->with(['topik.dosen', 'pembimbing2'])
+        // 2. Mengambil aplikasi terbaru (Sudah BERSIH dari pembimbing2)
+        $latestApp = Application::with(['topik.dosen'])
+                    ->where('mahasiswa_id', $user->mahasiswa_id)
                     ->orderBy('tanggal_submit', 'desc')
-                    ->get();
+                    ->first();
 
-        // Mengambil aplikasi terbaru (berada di urutan pertama dari riwayat)
-        $aplikasi = $riwayatAplikasi->first();
-
-        return view('mahasiswa.dashboard', compact('user', 'totalProject', 'aplikasi', 'riwayatAplikasi'));
+        // 3. Kirim data ke view dashboard
+        return view('mahasiswa.dashboard', compact('user', 'projectCount', 'latestApp'));
     }
 }

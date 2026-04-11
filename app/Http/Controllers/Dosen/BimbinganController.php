@@ -14,20 +14,16 @@ class BimbinganController extends Controller
     {
         $dosenId = Auth::guard('dosen')->id();
 
-        // Cari ID Topik di mana dosen ini adalah pembuatnya (Sebagai PBB 1)
+        // Cari ID Topik di mana dosen ini adalah pembuatnya
         $topikIds = TopikInterest::where('dosen_id', $dosenId)->pluck('topik_id');
 
-        // Ambil semua aplikasi berstatus APPROVED-FULL 
-        // di mana dosen ini adalah PBB 1 ATAU PBB 2
-        $bimbingans = Application::with(['mahasiswa', 'topik.dosen', 'pembimbing2'])
-            ->where('status', 'APPROVED-FULL')
-            ->where(function($query) use ($topikIds, $dosenId) {
-                $query->whereIn('topik_id', $topikIds) // Sebagai PBB 1
-                      ->orWhere('pembimbing_2_id', $dosenId); // Sebagai PBB 2
-            })
+        // Ambil semua mahasiswa yang sudah resmi disetujui (APPROVED)
+        $bimbingans = Application::with(['mahasiswa', 'topik'])
+            ->where('status', 'APPROVED')
+            ->whereIn('topik_id', $topikIds)
             ->orderBy('updated_at', 'desc')
             ->get();
 
-        return view('dosen.bimbingan.index', compact('bimbingans', 'dosenId'));
+        return view('dosen.bimbingan.index', compact('bimbingans'));
     }
 }

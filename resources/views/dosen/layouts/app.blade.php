@@ -196,11 +196,6 @@
                                 <i class="bi bi-calendar-range-fill"></i> Setting Periode
                             </a>
                         </li>
-                        <li class="nav-item">
-                            <a href="{{ route('dosen.prodi.assign.index') ?? '#' }}" class="nav-link {{ request()->routeIs('dosen.prodi.assign.*') ? 'active' : '' }}">
-                                <i class="bi bi-diagram-3-fill"></i> Plotting PBB 2
-                            </a>
-                        </li>
                     @endif
                 </ul>
             </div>
