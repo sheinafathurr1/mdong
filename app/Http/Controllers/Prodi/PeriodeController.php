@@ -11,7 +11,7 @@ class PeriodeController extends Controller
     public function index()
     {
         // Ambil semua periode, urutkan dari yang terbaru
-        $periodes = Periode::orderBy('start_date', 'desc')->get();
+        $periodes = Periode::orderBy('start_date', 'desc')->paginate(10);
         return view('dosen.prodi.periode.index', compact('periodes'));
     }
 

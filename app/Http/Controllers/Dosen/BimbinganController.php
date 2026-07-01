@@ -22,7 +22,7 @@ class BimbinganController extends Controller
             ->where('status', 'APPROVED')
             ->whereIn('topik_id', $topikIds)
             ->orderBy('updated_at', 'desc')
-            ->get();
+            ->paginate(9);
 
         return view('dosen.bimbingan.index', compact('bimbingans'));
     }

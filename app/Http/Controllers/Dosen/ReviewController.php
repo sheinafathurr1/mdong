@@ -24,14 +24,14 @@ class ReviewController extends Controller
             ->whereIn('topik_id', $topikIds)
             ->where('status', 'APPLIED')
             ->orderBy('tanggal_submit', 'asc')
-            ->get();
+            ->paginate(9, ['*'], 'menunggu_page');
 
         // Aplikasi yang sudah diproses (Riwayat)
         $riwayat = Application::with(['mahasiswa', 'topik'])
             ->whereIn('topik_id', $topikIds)
             ->whereIn('status', ['APPROVED', 'REJECTED'])
             ->orderBy('tanggal_response', 'desc')
-            ->get();
+            ->paginate(10, ['*'], 'riwayat_page');
 
         return view('dosen.review.index', compact('menunggu', 'riwayat'));
     }

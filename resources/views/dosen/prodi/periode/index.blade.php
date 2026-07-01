@@ -80,7 +80,7 @@
             </tr>
         </thead>
         <tbody>
-            @forelse($periodes as $index => $periode)
+            @forelse($periodes as $periode)
                 @php
                     $now = \Carbon\Carbon::now();
                     $start = \Carbon\Carbon::parse($periode->start_date);
@@ -112,7 +112,7 @@
                             </div>
                             <div>
                                 <h6 class="fw-bold text-dark mb-1">{{ $periode->nama_kode }}</h6>
-                                @if($index === 0) 
+                                @if($loop->first && $periodes->onFirstPage())
                                     <span class="badge bg-dark text-white rounded-pill px-2 py-1" style="font-size: 0.6rem;">TERBARU</span>
                                 @else
                                     <span class="text-muted small" style="font-size: 0.75rem;">Riwayat</span>
@@ -210,6 +210,10 @@
             @endforelse
         </tbody>
     </table>
+</div>
+
+<div class="px-1">
+    {{ $periodes->links('pagination::bootstrap-5') }}
 </div>
 
 <div class="modal fade" id="modalTambahPeriode" tabindex="-1" aria-hidden="true">

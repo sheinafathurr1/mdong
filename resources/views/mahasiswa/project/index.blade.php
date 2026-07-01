@@ -15,7 +15,7 @@
 <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 gap-3">
     <div>
         <h2 class="fw-extrabold text-dark mb-1">Portofolio Saya</h2>
-        <p class="text-muted mb-0">Total <span class="fw-bold text-dark">{{ $projects->count() }}</span> karya telah terdaftar dalam sistem.</p>
+        <p class="text-muted mb-0">Total <span class="fw-bold text-dark">{{ $projects->total() }}</span> karya telah terdaftar dalam sistem.</p>
     </div>
     
     @if(!$isLocked)
@@ -125,9 +125,13 @@
             </div>
         @endforeach
     </div>
+
+    <div class="mt-4">
+        {{ $projects->links('pagination::bootstrap-5') }}
+    </div>
 @endif
 
-@if(!$isLocked && $projects->count() > 0)
+@if(!$isLocked && $projects->total() > 0)
     <div class="mt-5 p-4 bg-dark text-white shadow-sm rounded-4 d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3">
         <div>
             <h5 class="fw-bold mb-1">Sudah Selesai Menyusun?</h5>

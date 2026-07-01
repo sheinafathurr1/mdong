@@ -20,7 +20,7 @@ class ProjectController extends Controller
 
     public function index()
     {
-        $projects = Project::where('mahasiswa_id', Auth::guard('mahasiswa')->id())->latest()->get();
+        $projects = Project::where('mahasiswa_id', Auth::guard('mahasiswa')->id())->latest()->paginate(9);
         
         // Cek status kunci untuk dikirim ke View
         $isLocked = $this->isPortfolioLocked();

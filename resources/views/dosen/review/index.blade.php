@@ -18,9 +18,9 @@
 <ul class="nav nav-pills mb-4 gap-2 border-bottom pb-3" id="reviewTab" role="tablist">
     <li class="nav-item" role="presentation">
         <button class="nav-link active rounded-pill fw-bold px-4" id="menunggu-tab" data-bs-toggle="tab" data-bs-target="#menunggu" type="button" role="tab">
-            Menunggu Review 
-            @if($menunggu->count() > 0)
-                <span class="badge bg-danger ms-2 rounded-circle">{{ $menunggu->count() }}</span>
+            Menunggu Review
+            @if($menunggu->total() > 0)
+                <span class="badge bg-danger ms-2 rounded-circle">{{ $menunggu->total() }}</span>
             @endif
         </button>
     </li>
@@ -71,6 +71,10 @@
                     </div>
                 @endforeach
             </div>
+
+            <div class="mt-4">
+                {{ $menunggu->links('pagination::bootstrap-5') }}
+            </div>
         @endif
     </div>
 
@@ -116,6 +120,10 @@
                 </table>
             </div>
         </div>
+
+        <div class="mt-4">
+            {{ $riwayat->links('pagination::bootstrap-5') }}
+        </div>
     </div>
 
 </div>
@@ -125,4 +133,13 @@
     .nav-pills .nav-link.active { background-color: #0f172a; color: white; }
     .nav-pills .nav-link:hover:not(.active) { background-color: #f1f5f9; color: #0f172a !important; }
 </style>
+
+@push('scripts')
+<script>
+    // Kalau URL mengandung parameter halaman riwayat, buka tab Riwayat setelah reload
+    if (new URLSearchParams(window.location.search).has('riwayat_page')) {
+        new bootstrap.Tab(document.getElementById('riwayat-tab')).show();
+    }
+</script>
+@endpush
 @endsection

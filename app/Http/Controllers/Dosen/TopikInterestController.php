@@ -20,7 +20,7 @@ class TopikInterestController extends Controller
                     ->join('periode', 'topik_interest.periode_id', '=', 'periode.periode_id')
                     ->orderByDesc('periode.start_date')
                     ->select('topik_interest.*')
-                    ->get();
+                    ->paginate(10);
 
         // Cek Periode Aktif
         $periodeAktif = Periode::aktif()->first();

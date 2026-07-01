@@ -16,7 +16,7 @@
     
     <div class="bg-white border rounded-pill px-4 py-2 d-inline-flex align-items-center shadow-sm">
         <i class="bi bi-people-fill text-dark me-2"></i>
-        <span class="fw-bold text-dark me-2">{{ $bimbingans->count() }}</span>
+        <span class="fw-bold text-dark me-2">{{ $bimbingans->total() }}</span>
         <span class="small text-muted fw-medium">Mahasiswa</span>
     </div>
 </div>
@@ -78,6 +78,10 @@
                 </div>
             </div>
         @endforeach
+    </div>
+
+    <div class="mt-4">
+        {{ $bimbingans->links('pagination::bootstrap-5') }}
     </div>
 @endif
 @endsection

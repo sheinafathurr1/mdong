@@ -18,8 +18,8 @@ class TopikController extends Controller
         // Cari periode yang aktif
         $periodeAktif = Periode::aktif()->first();
 
-        $topiks = collect();
-        
+        $topiks = new \Illuminate\Pagination\LengthAwarePaginator([], 0, 9);
+
         if ($periodeAktif) {
             // Mulai Query Builder
             $query = TopikInterest::with('dosen')
@@ -38,7 +38,7 @@ class TopikController extends Controller
             }
 
             // Eksekusi Query
-            $topiks = $query->get();
+            $topiks = $query->paginate(9)->withQueryString();
         }
 
         // Cek apakah mahasiswa sudah punya aplikasi aktif

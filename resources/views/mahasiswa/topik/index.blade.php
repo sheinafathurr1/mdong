@@ -86,7 +86,7 @@
 @else
     @if(request('search') || request('ketersediaan') == 'tersedia')
         <div class="mb-3 text-muted small fw-bold">
-            Menampilkan {{ $topiks->count() }} hasil pencarian
+            Menampilkan {{ $topiks->total() }} hasil pencarian
         </div>
     @endif
 
@@ -119,6 +119,10 @@
                 </a>
             </div>
         @endforeach
+    </div>
+
+    <div class="mt-4">
+        {{ $topiks->links('pagination::bootstrap-5') }}
     </div>
 @endif
 @endsection

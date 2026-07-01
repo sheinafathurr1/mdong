@@ -49,7 +49,7 @@
 @endif
 
 <div class="accordion custom-accordion" id="accordionTopik">
-    @forelse($topiks as $index => $topik)
+    @forelse($topiks as $topik)
         @php
             // Logika pengecekan status periode secara real-time
             $now = \Carbon\Carbon::now();
@@ -168,5 +168,9 @@
             </div>
         </div>
     @endforelse
+</div>
+
+<div class="mt-4">
+    {{ $topiks->links('pagination::bootstrap-5') }}
 </div>
 @endsection
