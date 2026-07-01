@@ -3,7 +3,8 @@
 namespace App\Http\Controllers\Prodi;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
+use App\Http\Requests\Prodi\StorePeriodeRequest;
+use App\Http\Requests\Prodi\UpdatePeriodeRequest;
 use App\Models\Periode;
 
 class PeriodeController extends Controller
@@ -15,13 +16,9 @@ class PeriodeController extends Controller
         return view('dosen.prodi.periode.index', compact('periodes'));
     }
 
-    public function store(Request $request)
+    public function store(StorePeriodeRequest $request)
     {
-        $validated = $request->validate([
-            'nama_kode' => 'required|string|max:255|unique:periode,nama_kode',
-            'start_date' => 'required|date',
-            'end_date' => 'required|date|after:start_date',
-        ]);
+        $validated = $request->validated();
 
         \App\Models\Periode::query()->update(['is_active' => false]);
 
@@ -65,16 +62,10 @@ class PeriodeController extends Controller
     }
 
     // Method untuk update data (Edit)
-    public function update(Request $request, $id)
+    public function update(UpdatePeriodeRequest $request, $id)
     {
-        $request->validate([
-            'nama_kode' => 'required|string|max:255|unique:periode,nama_kode,'.$id.',periode_id',
-            'start_date' => 'required|date',
-            'end_date' => 'required|date|after:start_date',
-        ]);
-
         $periode = Periode::findOrFail($id);
-        $periode->update($request->only(['nama_kode', 'start_date', 'end_date']));
+        $periode->update($request->validated());
 
         return redirect()->route('dosen.prodi.periode.index')->with('success', 'Periode akademik berhasil diperbarui.');
     }

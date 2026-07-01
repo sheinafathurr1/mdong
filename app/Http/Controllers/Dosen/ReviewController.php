@@ -39,14 +39,10 @@ class ReviewController extends Controller
     // 2. Menampilkan Detail Portofolio Mahasiswa
     public function show($id)
     {
-        $dosenId = Auth::guard('dosen')->id();
-        
         $application = Application::with(['mahasiswa.projects', 'topik'])->findOrFail($id);
 
         // Keamanan: Pastikan aplikasi ini melamar ke topik milik dosen yang sedang login
-        if ($application->topik->dosen_id !== $dosenId) {
-            abort(403, 'Anda tidak memiliki akses ke aplikasi ini.');
-        }
+        abort_unless(Auth::guard('dosen')->user()->can('review', $application), 403, 'Anda tidak memiliki akses ke aplikasi ini.');
 
         return view('dosen.review.show', compact('application'));
     }
@@ -54,12 +50,9 @@ class ReviewController extends Controller
     // 3. Memproses Keputusan (Approve / Reject)
     public function update(Request $request, $id)
     {
-        $dosenId = Auth::guard('dosen')->id();
         $application = Application::with('topik')->findOrFail($id);
 
-        if ($application->topik->dosen_id !== $dosenId) {
-            abort(403);
-        }
+        abort_unless(Auth::guard('dosen')->user()->can('review', $application), 403, 'Anda tidak memiliki akses ke aplikasi ini.');
 
         // 1. Validasi diubah menjadi APPROVED
         $request->validate([

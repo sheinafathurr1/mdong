@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Dosen;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use App\Http\Requests\Dosen\StoreTopikInterestRequest;
 use App\Models\TopikInterest;
 use App\Models\Periode;
 
@@ -64,7 +65,7 @@ class TopikInterestController extends Controller
     }
 
     // 3. Menyimpan Topik ke Database (Proteksi Form Resubmission)
-    public function store(Request $request)
+    public function store(StoreTopikInterestRequest $request)
     {
         $periodeAktif = Periode::aktif()->first();
 
@@ -79,14 +80,6 @@ class TopikInterestController extends Controller
         if ($topikAda) {
             return redirect()->route('dosen.topik.index')->with('error', 'Gagal menyimpan. Anda sudah memiliki topik pada periode ini.');
         }
-
-        $request->validate([
-            'periode_id' => 'required|exists:periode,periode_id',
-            'nama_topik' => 'required|string|max:255',
-            'deskripsi' => 'required|string',
-            'requirement' => 'nullable|string',
-            'limit_bimbingan' => 'required|integer|min:1',
-        ]);
 
         TopikInterest::create([
             'dosen_id' => Auth::guard('dosen')->id(),
