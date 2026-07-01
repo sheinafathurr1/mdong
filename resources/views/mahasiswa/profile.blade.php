@@ -27,7 +27,17 @@
                         </div>
                     @endif
                 </div>
-                
+
+                <form action="{{ route('mahasiswa.profile.update') }}" method="POST" enctype="multipart/form-data" class="mb-4">
+                    @csrf
+                    @method('PUT')
+                    <label for="photo" class="btn btn-sm btn-outline-dark rounded-pill px-3 fw-medium mb-0" style="cursor: pointer;">
+                        <i class="bi bi-camera me-1"></i> Ganti Foto
+                    </label>
+                    <input type="file" id="photo" name="photo" accept="image/*" class="d-none" onchange="this.form.submit()">
+                    @error('photo') <div class="small text-danger mt-2">{{ $message }}</div> @enderror
+                </form>
+
                 <h4 class="fw-bold mb-1">{{ $user->nama }}</h4>
                 <p class="text-muted mb-3">{{ $user->nim }}</p>
 
