@@ -30,8 +30,15 @@ class ProfileController extends Controller
 
         // Simpan pembaruan ke database
         // Catatan: Nama, NIM, Kelas, Angkatan, Email biasanya fix dari kampus
-        $user->no_tlp = $request->no_tlp;
-        $user->url_sosmed = $request->url_sosmed;
+        // Form upload foto hanya mengirim field 'photo', jadi no_tlp/url_sosmed
+        // cuma ditimpa kalau field-nya memang ikut dikirim (dari form kontak).
+        if ($request->has('no_tlp')) {
+            $user->no_tlp = $request->no_tlp;
+        }
+
+        if ($request->has('url_sosmed')) {
+            $user->url_sosmed = $request->url_sosmed;
+        }
 
         if ($request->hasFile('photo')) {
             // Hapus foto lama supaya tidak menumpuk file yatim di storage
