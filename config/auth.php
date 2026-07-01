@@ -135,6 +135,22 @@ return [
             'expire' => 60,
             'throttle' => 60,
         ],
+
+        // Broker reset password untuk guard Mahasiswa
+        'mahasiswa' => [
+            'provider' => 'mahasiswa',
+            'table' => env('AUTH_PASSWORD_RESET_TOKEN_TABLE', 'password_reset_tokens'),
+            'expire' => 60,
+            'throttle' => 60,
+        ],
+
+        // Broker reset password untuk guard Dosen/Prodi
+        'dosen' => [
+            'provider' => 'dosen',
+            'table' => env('AUTH_PASSWORD_RESET_TOKEN_TABLE', 'password_reset_tokens'),
+            'expire' => 60,
+            'throttle' => 60,
+        ],
     ],
 
     /*
