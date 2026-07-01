@@ -17,7 +17,7 @@ class PeriodeController extends Controller
 
     public function store(Request $request)
     {
-        $request->validate([
+        $validated = $request->validate([
             'nama_kode' => 'required|string|max:255|unique:periode,nama_kode',
             'start_date' => 'required|date',
             'end_date' => 'required|date|after:start_date',
@@ -25,7 +25,7 @@ class PeriodeController extends Controller
 
         \App\Models\Periode::query()->update(['is_active' => false]);
 
-        \App\Models\Periode::create($request->all());
+        \App\Models\Periode::create($validated + ['is_active' => true]);
 
         return redirect()->route('dosen.prodi.periode.index')
                          ->with('success', 'Periode akademik baru berhasil ditambahkan dan otomatis menjadi satu-satunya periode aktif.');

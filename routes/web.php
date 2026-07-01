@@ -18,7 +18,6 @@ use App\Http\Controllers\Dosen\BimbinganController;
 
 //Import Controller Prodi
 use App\Http\Controllers\Prodi\PeriodeController;
-use App\Http\Controllers\Prodi\AssignController;
 
 /*
 |--------------------------------------------------------------------------
@@ -35,7 +34,7 @@ Route::get('/', function () {
 // AREA AUTENTIKASI
 // ==========================================
 Route::get('/login', [AuthController::class, 'index'])->name('login');
-Route::post('/login', [AuthController::class, 'authenticate']);
+Route::post('/login', [AuthController::class, 'authenticate'])->middleware('throttle:5,1');
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
 

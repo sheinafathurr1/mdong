@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Dosen;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use App\Models\Application;
 use App\Models\TopikInterest;
 
@@ -67,13 +68,22 @@ class ReviewController extends Controller
 
         $statusBaru = $request->status;
 
-        // 2. Pengecekan IF diubah menjadi APPROVED
+        // 2. Pengecekan IF diubah menjadi APPROVED (dikunci agar tidak race condition saat approval bersamaan)
         if ($statusBaru === 'APPROVED') {
-            if ($application->topik->limit_applied >= $application->topik->limit_bimbingan) {
+            $gagalKarenaPenuh = DB::transaction(function () use ($application) {
+                $topik = TopikInterest::where('topik_id', $application->topik_id)->lockForUpdate()->first();
+
+                if ($topik->limit_applied >= $topik->limit_bimbingan) {
+                    return true;
+                }
+
+                $topik->increment('limit_applied');
+                return false;
+            });
+
+            if ($gagalKarenaPenuh) {
                 return back()->with('error', 'Gagal menyetujui! Kuota bimbingan topik ini sudah penuh.');
             }
-            // Tambah angka limit_applied di TopikInterest
-            $application->topik->increment('limit_applied');
         }
 
         // Simpan perubahan ke tabel Application

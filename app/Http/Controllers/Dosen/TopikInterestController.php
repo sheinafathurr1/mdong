@@ -14,20 +14,16 @@ class TopikInterestController extends Controller
     public function index()
     {
         $dosenId = Auth::guard('dosen')->id();
-        
+
         $topiks = TopikInterest::with('periode')
                     ->where('dosen_id', $dosenId)
-                    ->get()
-                    ->sortByDesc(function($topik) {
-                        return $topik->periode->start_date ?? '0000-00-00'; 
-                    });
+                    ->join('periode', 'topik_interest.periode_id', '=', 'periode.periode_id')
+                    ->orderByDesc('periode.start_date')
+                    ->select('topik_interest.*')
+                    ->get();
 
         // Cek Periode Aktif
-        $periodeAktif = \App\Models\Periode::where('is_active', true)
-                               ->whereDate('start_date', '<=', now())
-                               ->whereDate('end_date', '>=', now())
-                               ->latest('start_date')
-                               ->first();
+        $periodeAktif = Periode::aktif()->first();
 
         $canCreate = false;
         $pesanBlokir = 'Tidak ada periode akademik yang sedang aktif.';
@@ -50,11 +46,7 @@ class TopikInterestController extends Controller
     // 2. Menampilkan Form Tambah Topik (Proteksi Akses URL)
     public function create()
     {
-        $periodeAktif = \App\Models\Periode::where('is_active', true)
-                               ->whereDate('start_date', '<=', now())
-                               ->whereDate('end_date', '>=', now())
-                               ->latest('start_date')
-                               ->first();
+        $periodeAktif = Periode::aktif()->first();
 
         if (!$periodeAktif) {
             return redirect()->route('dosen.topik.index')->with('error', 'Pembuatan topik ditutup. Tidak ada periode akademik yang sedang aktif saat ini.');
@@ -74,11 +66,7 @@ class TopikInterestController extends Controller
     // 3. Menyimpan Topik ke Database (Proteksi Form Resubmission)
     public function store(Request $request)
     {
-        $periodeAktif = \App\Models\Periode::where('is_active', true)
-                               ->whereDate('start_date', '<=', now())
-                               ->whereDate('end_date', '>=', now())
-                               ->latest('start_date')
-                               ->first();
+        $periodeAktif = Periode::aktif()->first();
 
         if (!$periodeAktif || $request->periode_id != $periodeAktif->periode_id) {
             return redirect()->route('dosen.topik.index')->with('error', 'Gagal menyimpan. Periode tidak valid atau sudah ditutup.');
@@ -152,7 +140,9 @@ class TopikInterestController extends Controller
             'nama_topik' => 'required|string|max:255',
             'deskripsi' => 'required|string',
             'requirement' => 'nullable|string',
-            'limit_bimbingan' => 'required|integer|min:1',
+            'limit_bimbingan' => 'required|integer|min:' . max(1, $topik->limit_applied),
+        ], [
+            'limit_bimbingan.min' => 'Kuota tidak boleh lebih kecil dari jumlah mahasiswa yang sudah diterima (' . $topik->limit_applied . ').',
         ]);
 
         $topik->update($request->only(['nama_topik', 'deskripsi', 'requirement', 'limit_bimbingan']));

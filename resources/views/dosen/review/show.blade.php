@@ -180,7 +180,7 @@
                             <div class="col-12">
                                 <small class="text-muted fw-bold d-block text-uppercase mb-1" style="font-size: 0.7rem;"><i class="bi bi-link-45deg me-1"></i> Tautan Sosmed / LinkedIn</small>
                                 @if($application->mahasiswa->url_sosmed)
-                                    <a href="{{ $application->mahasiswa->url_sosmed }}" target="_blank" class="fw-bold text-primary text-decoration-none">
+                                    <a href="{{ $application->mahasiswa->url_sosmed }}" target="_blank" rel="noopener noreferrer" class="fw-bold text-primary text-decoration-none">
                                         Kunjungi Tautan <i class="bi bi-box-arrow-up-right ms-1" style="font-size: 0.8rem;"></i>
                                     </a>
                                 @else

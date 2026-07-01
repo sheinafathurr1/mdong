@@ -16,13 +16,9 @@ class TopikController extends Controller
     public function index(Request $request)
     {
         // Cari periode yang aktif
-        $periodeAktif = \App\Models\Periode::where('is_active', true)
-                               ->whereDate('start_date', '<=', now())
-                               ->whereDate('end_date', '>=', now())
-                               ->latest('start_date')
-                               ->first();
-        
-        $topiks = collect(); 
+        $periodeAktif = Periode::aktif()->first();
+
+        $topiks = collect();
         
         if ($periodeAktif) {
             // Mulai Query Builder
@@ -47,7 +43,7 @@ class TopikController extends Controller
 
         // Cek apakah mahasiswa sudah punya aplikasi aktif
         $hasApplication = \App\Models\Application::where('mahasiswa_id', \Illuminate\Support\Facades\Auth::guard('mahasiswa')->id())
-                                     ->whereIn('status', ['DRAFT', 'APPLIED', 'APPROVED-PBB1', 'APPROVED-FULL'])
+                                     ->whereIn('status', ['APPLIED', 'APPROVED'])
                                      ->exists();
 
         return view('mahasiswa.topik.index', compact('topiks', 'periodeAktif', 'hasApplication'));
@@ -61,7 +57,7 @@ class TopikController extends Controller
         
         // Cek apakah punya aplikasi yang sedang berjalan/disetujui
         $hasApplication = Application::where('mahasiswa_id', $mahasiswaId)
-                                     ->whereIn('status', ['DRAFT', 'APPLIED', 'APPROVED-PBB1', 'APPROVED-FULL'])
+                                     ->whereIn('status', ['APPLIED', 'APPROVED'])
                                      ->exists();
                                      
         // Cek apakah punya portofolio
@@ -80,6 +76,17 @@ class TopikController extends Controller
     public function apply(Request $request, $id)
     {
         $mahasiswaId = Auth::guard('mahasiswa')->id();
+        $topik = TopikInterest::findOrFail($id);
+
+        // Validasi 0: Topik harus milik periode yang sedang aktif dan kuotanya belum penuh
+        $periodeAktif = Periode::aktif()->first();
+        if (!$periodeAktif || $topik->periode_id !== $periodeAktif->periode_id) {
+            return back()->with('error', 'Topik ini tidak lagi dibuka pada periode aktif saat ini.');
+        }
+
+        if ($topik->limit_applied >= $topik->limit_bimbingan) {
+            return back()->with('error', 'Kuota bimbingan topik ini sudah penuh.');
+        }
 
         // Validasi 1: Pastikan sudah punya portofolio
         if (!Project::where('mahasiswa_id', $mahasiswaId)->exists()) {
@@ -89,7 +96,7 @@ class TopikController extends Controller
 
         // Validasi 2: Pastikan belum apply topik lain yang sedang aktif
         $existingApp = Application::where('mahasiswa_id', $mahasiswaId)
-                                  ->whereIn('status', ['APPLIED', 'APPROVED-PBB1', 'APPROVED-FULL'])
+                                  ->whereIn('status', ['APPLIED', 'APPROVED'])
                                   ->first();
                                   
         if ($existingApp) {

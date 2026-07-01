@@ -14,7 +14,7 @@ class ProjectController extends Controller
     private function isPortfolioLocked()
     {
         return Application::where('mahasiswa_id', Auth::guard('mahasiswa')->id())
-                          ->whereIn('status', ['APPLIED', 'APPROVED-PBB1', 'APPROVED-FULL'])
+                          ->whereIn('status', ['APPLIED', 'APPROVED'])
                           ->exists();
     }
 
@@ -98,7 +98,7 @@ class ProjectController extends Controller
                           ->where('mahasiswa_id', Auth::guard('mahasiswa')->id())
                           ->firstOrFail();
 
-        $request->validate([
+        $validated = $request->validate([
             'nama_proyek' => 'required|string|max:255',
             'tipe_proyek' => 'required|in:Perancangan,Analisa',
             'teknik'      => 'nullable|string|max:255',
@@ -107,7 +107,7 @@ class ProjectController extends Controller
             'narasi'      => 'required|string',
         ]);
 
-        $project->update($request->all());
+        $project->update($validated);
 
         return redirect()->route('mahasiswa.project.index')->with('success', 'Proyek berhasil diperbarui!');
     }
