@@ -16,6 +16,7 @@ use App\Http\Controllers\Dosen\DosenDashboardController;
 use App\Http\Controllers\Dosen\TopikInterestController;
 use App\Http\Controllers\Dosen\ReviewController;
 use App\Http\Controllers\Dosen\BimbinganController;
+use App\Http\Controllers\Dosen\ProfileController as DosenProfileController;
 
 //Import Controller Prodi
 use App\Http\Controllers\Prodi\PeriodeController;
@@ -89,6 +90,10 @@ Route::middleware(['role:dosen'])
         
         // Dashboard Dosen
         Route::get('/dashboard', [DosenDashboardController::class, 'index'])->name('dashboard');
+
+        // Route Profil Dosen
+        Route::get('/profil', [DosenProfileController::class, 'index'])->name('profile.index');
+        Route::put('/profil', [DosenProfileController::class, 'update'])->name('profile.update');
 
         // Route Topik Interest Dosen
         Route::get('/topik-interest', [TopikInterestController::class, 'index'])->name('topik.index');

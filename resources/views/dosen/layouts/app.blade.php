@@ -232,7 +232,7 @@
                                 <span class="d-block small text-muted">Kode: {{ $user->kode ?? '-' }}</span>
                             </li>
                             <li><hr class="dropdown-divider my-2"></li>
-                            <li><a class="dropdown-item rounded-3 py-2 fw-medium text-secondary" href="#"><i class="bi bi-person-gear me-2"></i> Pengaturan Profil</a></li>
+                            <li><a class="dropdown-item rounded-3 py-2 fw-medium text-secondary" href="{{ route('dosen.profile.index') }}"><i class="bi bi-person-gear me-2"></i> Pengaturan Profil</a></li>
                             <li>
                                 <form action="{{ route('logout') }}" method="POST" class="m-0 p-0">
                                     @csrf

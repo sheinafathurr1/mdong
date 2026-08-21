@@ -230,9 +230,16 @@
                     
                     <div class="mt-auto">
                         @if($status === 'APPROVED')
-                            <a href="https://wa.me/{{ preg_replace('/[^0-9]/', '', $aplikasi->topik->dosen->no_tlp ?? '') }}" target="_blank" class="btn btn-dark w-100 rounded-pill py-3 fw-bold shadow-sm d-flex align-items-center justify-content-center gap-2 transition-all hover-lift">
-                                <i class="bi bi-whatsapp text-success fs-5"></i> Hubungi via WhatsApp
-                            </a>
+                            @if($aplikasi->topik->dosen->link_grup)
+                                <a href="{{ $aplikasi->topik->dosen->link_grup }}" target="_blank" rel="noopener noreferrer" class="btn btn-dark w-100 rounded-pill py-3 fw-bold shadow-sm d-flex align-items-center justify-content-center gap-2 transition-all hover-lift">
+                                    <i class="bi bi-chat-dots-fill text-success fs-5"></i> Gabung Grup Bimbingan
+                                </a>
+                            @else
+                                <button class="btn btn-light border w-100 rounded-pill py-3 fw-bold text-muted d-flex align-items-center justify-content-center gap-2" disabled>
+                                    <i class="bi bi-hourglass-split"></i> Link Grup Belum Tersedia
+                                </button>
+                                <div class="form-text mt-2 small text-muted text-center">Dosen pembimbing Anda belum menambahkan link grup bimbingan.</div>
+                            @endif
                         @else
                             <button class="btn btn-light border w-100 rounded-pill py-3 fw-bold text-muted d-flex align-items-center justify-content-center gap-2" disabled>
                                 <i class="bi bi-lock-fill"></i> Kontak Terkunci
