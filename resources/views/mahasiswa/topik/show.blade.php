@@ -73,6 +73,11 @@
                             <i class="bi bi-exclamation-triangle-fill me-1 text-warning"></i> Portofolio belum diisi. Anda wajib mengisi minimal 1 proyek sebelum mendaftar.
                         </div>
                         <a href="{{ route('mahasiswa.project.create') }}" class="btn btn-outline-dark fw-bold rounded-pill px-5 py-3">Isi Portofolio Sekarang</a>
+                    @elseif(!$hasPortfolioLink)
+                        <div class="alert alert-warning border-warning rounded-3 p-3 text-dark fw-medium small mb-3">
+                            <i class="bi bi-exclamation-triangle-fill me-1 text-warning"></i> Link portofolio belum diisi. Anda wajib menambahkan tautan portofolio sebelum mendaftar.
+                        </div>
+                        <a href="{{ route('mahasiswa.project.index') }}" class="btn btn-outline-dark fw-bold rounded-pill px-5 py-3">Lengkapi Link Portofolio</a>
                     @elseif($sisa <= 0)
                         <div class="alert alert-danger border-danger rounded-3 p-3 text-danger fw-medium small mb-0">
                             <i class="bi bi-x-circle-fill me-1"></i> Kuota untuk topik ini sudah penuh.

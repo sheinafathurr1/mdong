@@ -67,6 +67,9 @@ class TopikController extends Controller
         // Cek apakah punya portofolio
         $hasPortofolio = Project::where('mahasiswa_id', $mahasiswaId)->exists();
 
+        // Cek apakah link portofolio (url_sosmed) sudah diisi
+        $hasPortfolioLink = (bool) Auth::guard('mahasiswa')->user()->url_sosmed;
+
         // Cek apakah PERNAH DITOLAK di topik INI secara spesifik
         $isRejectedFromThisTopic = Application::where('mahasiswa_id', $mahasiswaId)
                                               ->where('topik_id', $id)
@@ -76,7 +79,7 @@ class TopikController extends Controller
         // Kuota reservasi (antrean) penuh, terlepas dari kuota bimbingan masih ada atau tidak
         $reservasiPenuh = $topik->reservasi_applied >= $topik->limit_reservasi;
 
-        return view('mahasiswa.topik.show', compact('topik', 'hasApplication', 'hasPortofolio', 'isRejectedFromThisTopic', 'reservasiPenuh'));
+        return view('mahasiswa.topik.show', compact('topik', 'hasApplication', 'hasPortofolio', 'hasPortfolioLink', 'isRejectedFromThisTopic', 'reservasiPenuh'));
     }
 
     // 3. Memproses Pendaftaran (Apply) Topik
@@ -99,6 +102,12 @@ class TopikController extends Controller
         if (!Project::where('mahasiswa_id', $mahasiswaId)->exists()) {
             return redirect()->route('mahasiswa.project.create')
                              ->with('error', 'Anda harus memiliki minimal 1 portofolio sebelum mendaftar topik.');
+        }
+
+        // Validasi 1b: Pastikan link portofolio (url_sosmed) sudah diisi
+        if (!Auth::guard('mahasiswa')->user()->url_sosmed) {
+            return redirect()->route('mahasiswa.project.index')
+                             ->with('error', 'Anda harus melengkapi link portofolio terlebih dahulu sebelum mendaftar topik.');
         }
 
         // Validasi 2: Pastikan belum apply topik lain yang sedang aktif
