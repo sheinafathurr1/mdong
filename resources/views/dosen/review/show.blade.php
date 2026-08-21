@@ -33,10 +33,16 @@
                 <p class="text-muted mb-4">{{ $application->mahasiswa->nim }} — {{ $application->mahasiswa->program_studi }}</p>
                 
                 <div class="d-flex justify-content-center gap-2 mb-3">
-                    <a href="https://wa.me/{{ preg_replace('/[^0-9]/', '', $application->mahasiswa->no_tlp) }}" target="_blank" class="btn btn-outline-success btn-sm rounded-pill px-3 fw-bold">
-                        <i class="bi bi-whatsapp me-1"></i> Hubungi
-                    </a>
-                    
+                    @if($application->mahasiswa->url_sosmed)
+                        <a href="{{ $application->mahasiswa->url_sosmed }}" target="_blank" rel="noopener noreferrer" class="btn btn-outline-primary btn-sm rounded-pill px-3 fw-bold">
+                            <i class="bi bi-link-45deg me-1"></i> Lihat Portofolio
+                        </a>
+                    @else
+                        <button type="button" class="btn btn-outline-secondary btn-sm rounded-pill px-3 fw-bold" disabled title="Mahasiswa belum menambahkan tautan portofolio">
+                            <i class="bi bi-link-45deg me-1"></i> Portofolio Kosong
+                        </button>
+                    @endif
+
                     <button type="button" class="btn btn-outline-dark btn-sm rounded-pill px-3 fw-bold" data-bs-toggle="modal" data-bs-target="#profilModal">
                         <i class="bi bi-person-vcard me-1"></i> Lihat Profil
                     </button>
