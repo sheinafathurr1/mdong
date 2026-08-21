@@ -1,4 +1,4 @@
-@extends('mahasiswa.layouts.app')
+@extends('dosen.layouts.app')
 
 @section('title', 'Profil Saya')
 
@@ -28,7 +28,7 @@
                     @endif
                 </div>
 
-                <form action="{{ route('mahasiswa.profile.update') }}" method="POST" enctype="multipart/form-data" class="mb-4">
+                <form action="{{ route('dosen.profile.update') }}" method="POST" enctype="multipart/form-data" class="mb-4">
                     @csrf
                     @method('PUT')
                     <label for="photo" class="btn btn-sm btn-outline-dark rounded-pill px-3 fw-medium mb-0" style="cursor: pointer;">
@@ -39,7 +39,7 @@
                 </form>
 
                 <h4 class="fw-bold mb-1">{{ $user->nama }}</h4>
-                <p class="text-muted mb-3">{{ $user->nim }}</p>
+                <p class="text-muted mb-3">{{ $user->kode }}</p>
 
                 <div class="bg-light rounded-3 p-3 text-start mb-3 border">
                     <div class="mb-2">
@@ -47,12 +47,12 @@
                         <span class="fw-medium text-dark">{{ $user->program_studi }}</span>
                     </div>
                     <div class="mb-2">
-                        <small class="text-muted fw-bold d-block text-uppercase" style="font-size: 0.7rem;">Kelas</small>
-                        <span class="fw-medium text-dark">{{ $user->kelas ?? '-' }}</span>
+                        <small class="text-muted fw-bold d-block text-uppercase" style="font-size: 0.7rem;">NIP</small>
+                        <span class="fw-medium text-dark">{{ $user->nip ?? '-' }}</span>
                     </div>
                     <div>
-                        <small class="text-muted fw-bold d-block text-uppercase" style="font-size: 0.7rem;">Angkatan</small>
-                        <span class="fw-medium text-dark">{{ $user->angkatan }}</span>
+                        <small class="text-muted fw-bold d-block text-uppercase" style="font-size: 0.7rem;">Status</small>
+                        <span class="fw-medium text-dark">{{ $user->is_admin === 'YES' ? 'Dosen & Admin Prodi' : 'Dosen Pembimbing' }}</span>
                     </div>
                 </div>
                 <div class="small text-muted">
@@ -65,9 +65,9 @@
     <div class="col-lg-8">
         <div class="card border border-light-subtle shadow-sm rounded-4 h-100">
             <div class="card-body p-4 p-md-5">
-                <h5 class="fw-bold mb-4">Informasi Kontak & Sosial</h5>
-                
-                <form action="{{ route('mahasiswa.profile.update') }}" method="POST">
+                <h5 class="fw-bold mb-4">Informasi Kontak & Grup Bimbingan</h5>
+
+                <form action="{{ route('dosen.profile.update') }}" method="POST">
                     @csrf
                     @method('PUT')
 
@@ -82,15 +82,18 @@
                         </div>
 
                         <div class="col-md-6 mb-3">
-                            <label for="no_tlp" class="form-label fw-medium small">Nomor Telepon / WhatsApp <span class="text-danger">*</span></label>
-                            <input type="text" class="form-control" id="no_tlp" name="no_tlp" value="{{ old('no_tlp', $user->no_tlp) }}" placeholder="Contoh: 08123456789" required>
+                            <label for="no_tlp" class="form-label fw-medium small">Nomor Telepon / WhatsApp</label>
+                            <input type="text" class="form-control" id="no_tlp" name="no_tlp" value="{{ old('no_tlp', $user->no_tlp) }}" placeholder="Contoh: 08123456789">
                             @error('no_tlp') <small class="text-danger">{{ $message }}</small> @enderror
                         </div>
 
                         <div class="col-md-6 mb-4">
-                            <label for="url_sosmed" class="form-label fw-medium small">Link Portfolio / LinkedIn / Instagram</label>
-                            <input type="url" class="form-control" id="url_sosmed" name="url_sosmed" value="{{ old('url_sosmed', $user->url_sosmed) }}" placeholder="https://...">
-                            @error('url_sosmed') <small class="text-danger">{{ $message }}</small> @enderror
+                            <label for="link_grup" class="form-label fw-medium small">Link Grup Bimbingan (WhatsApp / Telegram / dll)</label>
+                            <input type="url" class="form-control" id="link_grup" name="link_grup" value="{{ old('link_grup', $user->link_grup) }}" placeholder="https://chat.whatsapp.com/... atau https://t.me/...">
+                            @error('link_grup') <small class="text-danger">{{ $message }}</small> @enderror
+                            <div class="form-text small text-muted mt-2">
+                                <i class="bi bi-info-circle me-1"></i> Link ini akan ditampilkan ke mahasiswa yang aplikasinya sudah <strong>disetujui</strong>, supaya mereka bisa langsung bergabung ke grup bimbingan Anda.
+                            </div>
                         </div>
                     </div>
 

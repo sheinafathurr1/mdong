@@ -3,8 +3,9 @@
 namespace App\Http\Controllers\Mahasiswa;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use App\Http\Requests\Mahasiswa\StoreProjectRequest;
+use App\Http\Requests\Mahasiswa\UpdateProjectRequest;
 use App\Models\Project;
 use App\Models\Application; // Pastikan Model Application di-import
 
@@ -14,18 +15,19 @@ class ProjectController extends Controller
     private function isPortfolioLocked()
     {
         return Application::where('mahasiswa_id', Auth::guard('mahasiswa')->id())
-                          ->whereIn('status', ['APPLIED', 'APPROVED-PBB1', 'APPROVED-FULL'])
+                          ->whereIn('status', ['APPLIED', 'APPROVED'])
                           ->exists();
     }
 
     public function index()
     {
-        $projects = Project::where('mahasiswa_id', Auth::guard('mahasiswa')->id())->latest()->get();
-        
+        $user = Auth::guard('mahasiswa')->user();
+        $projects = Project::where('mahasiswa_id', $user->mahasiswa_id)->latest()->paginate(9);
+
         // Cek status kunci untuk dikirim ke View
         $isLocked = $this->isPortfolioLocked();
 
-        return view('mahasiswa.project.index', compact('projects', 'isLocked'));
+        return view('mahasiswa.project.index', compact('projects', 'isLocked', 'user'));
     }
 
     public function create()
@@ -37,26 +39,11 @@ class ProjectController extends Controller
         return view('mahasiswa.project.create');
     }
 
-    public function store(Request $request)
+    public function store(StoreProjectRequest $request)
     {
         if ($this->isPortfolioLocked()) {
             return redirect()->route('mahasiswa.project.index')->with('error', 'Akses ditolak. Portofolio terkunci.');
         }
-
-        $request->validate([
-            'nama_proyek'   => 'required|array',
-            'nama_proyek.*' => 'required|string|max:255',
-            'tipe_proyek'   => 'required|array',
-            'tipe_proyek.*' => 'required|in:Perancangan,Analisa',
-            'teknik'        => 'nullable|array',
-            'teknik.*'      => 'nullable|string|max:255',
-            'metode'        => 'nullable|array',
-            'metode.*'      => 'nullable|string|max:255',
-            'material'      => 'nullable|array',
-            'material.*'    => 'nullable|string|max:255',
-            'narasi'        => 'required|array',
-            'narasi.*'      => 'required|string',
-        ]);
 
         $mahasiswaId = Auth::guard('mahasiswa')->id();
 
@@ -88,7 +75,7 @@ class ProjectController extends Controller
         return view('mahasiswa.project.edit', compact('project'));
     }
 
-    public function update(Request $request, $id)
+    public function update(UpdateProjectRequest $request, $id)
     {
         if ($this->isPortfolioLocked()) {
             return redirect()->route('mahasiswa.project.index')->with('error', 'Akses ditolak. Portofolio terkunci.');
@@ -98,16 +85,7 @@ class ProjectController extends Controller
                           ->where('mahasiswa_id', Auth::guard('mahasiswa')->id())
                           ->firstOrFail();
 
-        $request->validate([
-            'nama_proyek' => 'required|string|max:255',
-            'tipe_proyek' => 'required|in:Perancangan,Analisa',
-            'teknik'      => 'nullable|string|max:255',
-            'metode'      => 'nullable|string|max:255',
-            'material'    => 'nullable|string|max:255',
-            'narasi'      => 'required|string',
-        ]);
-
-        $project->update($request->all());
+        $project->update($request->validated());
 
         return redirect()->route('mahasiswa.project.index')->with('success', 'Proyek berhasil diperbarui!');
     }

@@ -196,11 +196,6 @@
                                 <i class="bi bi-calendar-range-fill"></i> Setting Periode
                             </a>
                         </li>
-                        <li class="nav-item">
-                            <a href="{{ route('dosen.prodi.assign.index') ?? '#' }}" class="nav-link {{ request()->routeIs('dosen.prodi.assign.*') ? 'active' : '' }}">
-                                <i class="bi bi-diagram-3-fill"></i> Plotting PBB 2
-                            </a>
-                        </li>
                     @endif
                 </ul>
             </div>
@@ -237,7 +232,7 @@
                                 <span class="d-block small text-muted">Kode: {{ $user->kode ?? '-' }}</span>
                             </li>
                             <li><hr class="dropdown-divider my-2"></li>
-                            <li><a class="dropdown-item rounded-3 py-2 fw-medium text-secondary" href="#"><i class="bi bi-person-gear me-2"></i> Pengaturan Profil</a></li>
+                            <li><a class="dropdown-item rounded-3 py-2 fw-medium text-secondary" href="{{ route('dosen.profile.index') }}"><i class="bi bi-person-gear me-2"></i> Pengaturan Profil</a></li>
                             <li>
                                 <form action="{{ route('logout') }}" method="POST" class="m-0 p-0">
                                     @csrf
@@ -266,13 +261,15 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    
+
     <script>
         document.getElementById('sidebarToggle').addEventListener('click', function() {
             document.getElementById('sidebar').classList.toggle('active');
         });
     </script>
-    
+
+    @include('partials.confirm-modal')
+
     @stack('scripts')
 </body>
 </html>

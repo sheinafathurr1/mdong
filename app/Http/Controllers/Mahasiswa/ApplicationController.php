@@ -14,7 +14,7 @@ class ApplicationController extends Controller
         $mahasiswaId = Auth::guard('mahasiswa')->id();
         
         // Ambil aplikasi terbaru milik mahasiswa ini beserta relasinya
-        $aplikasi = Application::with(['topik.dosen', 'pembimbing2'])
+        $aplikasi = Application::with(['topik.dosen'])
                                ->where('mahasiswa_id', $mahasiswaId)
                                ->latest()
                                ->first();

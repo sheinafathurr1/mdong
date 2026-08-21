@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Dosen;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use App\Models\Application;
 use App\Models\TopikInterest;
 
@@ -23,14 +24,14 @@ class ReviewController extends Controller
             ->whereIn('topik_id', $topikIds)
             ->where('status', 'APPLIED')
             ->orderBy('tanggal_submit', 'asc')
-            ->get();
+            ->paginate(9, ['*'], 'menunggu_page');
 
         // Aplikasi yang sudah diproses (Riwayat)
         $riwayat = Application::with(['mahasiswa', 'topik'])
             ->whereIn('topik_id', $topikIds)
-            ->whereIn('status', ['APPROVED-PBB1', 'APPROVED-FULL', 'REJECTED'])
+            ->whereIn('status', ['APPROVED', 'REJECTED'])
             ->orderBy('tanggal_response', 'desc')
-            ->get();
+            ->paginate(10, ['*'], 'riwayat_page');
 
         return view('dosen.review.index', compact('menunggu', 'riwayat'));
     }
@@ -38,14 +39,10 @@ class ReviewController extends Controller
     // 2. Menampilkan Detail Portofolio Mahasiswa
     public function show($id)
     {
-        $dosenId = Auth::guard('dosen')->id();
-        
         $application = Application::with(['mahasiswa.projects', 'topik'])->findOrFail($id);
 
         // Keamanan: Pastikan aplikasi ini melamar ke topik milik dosen yang sedang login
-        if ($application->topik->dosen_id !== $dosenId) {
-            abort(403, 'Anda tidak memiliki akses ke aplikasi ini.');
-        }
+        abort_unless(Auth::guard('dosen')->user()->can('review', $application), 403, 'Anda tidak memiliki akses ke aplikasi ini.');
 
         return view('dosen.review.show', compact('application'));
     }
@@ -53,26 +50,45 @@ class ReviewController extends Controller
     // 3. Memproses Keputusan (Approve / Reject)
     public function update(Request $request, $id)
     {
-        $dosenId = Auth::guard('dosen')->id();
         $application = Application::with('topik')->findOrFail($id);
 
-        if ($application->topik->dosen_id !== $dosenId) {
-            abort(403);
+        abort_unless(Auth::guard('dosen')->user()->can('review', $application), 403, 'Anda tidak memiliki akses ke aplikasi ini.');
+
+        if ($application->status !== 'APPLIED') {
+            return back()->with('error', 'Aplikasi ini sudah diproses sebelumnya.');
         }
 
+        // 1. Validasi diubah menjadi APPROVED
         $request->validate([
-            'status' => 'required|in:APPROVED-PBB1,REJECTED'
+            'status' => 'required|in:APPROVED,REJECTED'
         ]);
 
         $statusBaru = $request->status;
 
-        // Jika Dosen menekan Approve, cek dulu apakah kuota masih ada
-        if ($statusBaru === 'APPROVED-PBB1') {
-            if ($application->topik->limit_applied >= $application->topik->limit_bimbingan) {
-                return back()->with('error', 'Gagal menyetujui! Kuota bimbingan topik ini sudah penuh.');
+        // 2. Dikunci agar tidak race condition saat approval/reject bersamaan
+        $gagalKarenaPenuh = DB::transaction(function () use ($application, $statusBaru) {
+            $topik = TopikInterest::where('topik_id', $application->topik_id)->lockForUpdate()->first();
+
+            if ($statusBaru === 'APPROVED') {
+                if ($topik->limit_applied >= $topik->limit_bimbingan) {
+                    return true;
+                }
+
+                $topik->increment('limit_applied');
+            } else {
+                // REJECTED: kembalikan slot reservasi yang terpakai saat apply.
+                // Kuota bimbingan tidak disentuh karena memang belum pernah dikurangi.
+                // Dijaga tidak sampai minus untuk aplikasi lama sebelum kolom ini ada.
+                if ($topik->reservasi_applied > 0) {
+                    $topik->decrement('reservasi_applied');
+                }
             }
-            // Tambah angka limit_applied di TopikInterest
-            $application->topik->increment('limit_applied');
+
+            return false;
+        });
+
+        if ($gagalKarenaPenuh) {
+            return back()->with('error', 'Gagal menyetujui! Kuota bimbingan topik ini sudah penuh.');
         }
 
         // Simpan perubahan ke tabel Application
@@ -81,7 +97,8 @@ class ReviewController extends Controller
             'tanggal_response' => now(),
         ]);
 
-        $pesan = $statusBaru === 'APPROVED-PBB1' ? 'Aplikasi mahasiswa berhasil disetujui!' : 'Aplikasi mahasiswa telah ditolak.';
+        // 3. Pesan sukses
+        $pesan = $statusBaru === 'APPROVED' ? 'Aplikasi mahasiswa berhasil disetujui!' : 'Aplikasi mahasiswa telah ditolak.';
 
         return redirect()->route('dosen.review.index')->with('success', $pesan);
     }

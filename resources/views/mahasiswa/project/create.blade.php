@@ -83,19 +83,34 @@
                             
                             <div class="col-md-4">
                                 <div class="form-floating">
-                                    <input type="text" class="form-control" name="teknik[]" placeholder="Teknik">
+                                    <select class="form-select" name="teknik[]">
+                                        <option value="" selected>Pilih Teknik...</option>
+                                        @foreach(\App\Models\Project::TEKNIK_OPTIONS as $opsi)
+                                            <option value="{{ $opsi }}">{{ $opsi }}</option>
+                                        @endforeach
+                                    </select>
                                     <label>Teknik Pengerjaan</label>
                                 </div>
                             </div>
                             <div class="col-md-4">
                                 <div class="form-floating">
-                                    <input type="text" class="form-control" name="metode[]" placeholder="Metode">
-                                    <label>Metode / Pendekatan</label>
+                                    <select class="form-select" name="metode[]">
+                                        <option value="" selected>Pilih Skill Set...</option>
+                                        @foreach(\App\Models\Project::SKILL_SET_OPTIONS as $opsi)
+                                            <option value="{{ $opsi }}">{{ $opsi }}</option>
+                                        @endforeach
+                                    </select>
+                                    <label>Metode / Skill Set</label>
                                 </div>
                             </div>
                             <div class="col-md-4">
                                 <div class="form-floating">
-                                    <input type="text" class="form-control" name="material[]" placeholder="Material">
+                                    <select class="form-select" name="material[]">
+                                        <option value="" selected>Pilih Material...</option>
+                                        @foreach(\App\Models\Project::MATERIAL_OPTIONS as $opsi)
+                                            <option value="{{ $opsi }}">{{ $opsi }}</option>
+                                        @endforeach
+                                    </select>
                                     <label>Material Utama</label>
                                 </div>
                             </div>
@@ -134,6 +149,11 @@
         let projectIndex = 1;
         const container = document.getElementById('dynamic-fields-container');
         const addBtn = document.getElementById('add-project-btn');
+
+        // Opsi dropdown Teknik/Skill Set/Material, dipakai saat menambah baris proyek baru
+        const teknikOptions = `<option value="" selected>Pilih Teknik...</option>@foreach(\App\Models\Project::TEKNIK_OPTIONS as $opsi)<option value="{{ $opsi }}">{{ $opsi }}</option>@endforeach`;
+        const skillSetOptions = `<option value="" selected>Pilih Skill Set...</option>@foreach(\App\Models\Project::SKILL_SET_OPTIONS as $opsi)<option value="{{ $opsi }}">{{ $opsi }}</option>@endforeach`;
+        const materialOptions = `<option value="" selected>Pilih Material...</option>@foreach(\App\Models\Project::MATERIAL_OPTIONS as $opsi)<option value="{{ $opsi }}">{{ $opsi }}</option>@endforeach`;
 
         addBtn.addEventListener('click', function () {
             // Tutup accordion yang sedang terbuka (opsional, agar rapi)
@@ -184,19 +204,19 @@
                             
                             <div class="col-md-4">
                                 <div class="form-floating">
-                                    <input type="text" class="form-control" name="teknik[]" placeholder="Teknik">
+                                    <select class="form-select" name="teknik[]">${teknikOptions}</select>
                                     <label>Teknik Pengerjaan</label>
                                 </div>
                             </div>
                             <div class="col-md-4">
                                 <div class="form-floating">
-                                    <input type="text" class="form-control" name="metode[]" placeholder="Metode">
-                                    <label>Metode / Pendekatan</label>
+                                    <select class="form-select" name="metode[]">${skillSetOptions}</select>
+                                    <label>Metode / Skill Set</label>
                                 </div>
                             </div>
                             <div class="col-md-4">
                                 <div class="form-floating">
-                                    <input type="text" class="form-control" name="material[]" placeholder="Material">
+                                    <select class="form-select" name="material[]">${materialOptions}</select>
                                     <label>Material Utama</label>
                                 </div>
                             </div>
@@ -207,7 +227,7 @@
                                     <label>Narasi / Penjelasan Proyek <span class="text-danger">*</span></label>
                                 </div>
                             </div>
-                            
+
                             <div class="col-12 text-end mt-4 pt-3 border-top">
                                 <button type="button" class="btn btn-outline-danger rounded-pill px-4 fw-bold" onclick="removeProject(${projectIndex})">
                                     <i class="bi bi-trash3 me-2"></i> Hapus Proyek Ini

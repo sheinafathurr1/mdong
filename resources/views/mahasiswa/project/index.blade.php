@@ -15,7 +15,7 @@
 <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 gap-3">
     <div>
         <h2 class="fw-extrabold text-dark mb-1">Portofolio Saya</h2>
-        <p class="text-muted mb-0">Total <span class="fw-bold text-dark">{{ $projects->count() }}</span> karya telah terdaftar dalam sistem.</p>
+        <p class="text-muted mb-0">Total <span class="fw-bold text-dark">{{ $projects->total() }}</span> karya telah terdaftar dalam sistem.</p>
     </div>
     
     @if(!$isLocked)
@@ -46,6 +46,34 @@
             <h5 class="fw-bold text-dark mb-1">Portofolio Terkunci (Read-Only)</h5>
             <p class="mb-0 text-dark small">Anda sedang dalam proses pengajuan Topik Pra-TA atau telah disetujui. Selama masa ini, Anda tidak dapat menambah, mengubah, atau menghapus data portofolio agar dosen pembimbing dapat melakukan review dengan data yang konsisten.</p>
         </div>
+    </div>
+@endif
+
+@if(!$user->url_sosmed)
+    <div class="alert alert-danger border-danger border-2 p-4 rounded-4 mb-5 shadow-sm d-flex flex-column flex-md-row align-items-md-center gap-3">
+        <div class="d-flex align-items-center flex-grow-1">
+            <i class="bi bi-link-45deg fs-1 me-4 text-danger"></i>
+            <div>
+                <h5 class="fw-bold text-dark mb-1">Link Portofolio Wajib Diisi</h5>
+                <p class="mb-0 text-dark small">Sebelum bisa mendaftar ke topik dosen, Anda wajib menambahkan tautan portofolio (mis. Instagram, LinkedIn, Behance, Google Drive) agar dosen dapat melihat karya Anda secara lengkap.</p>
+            </div>
+        </div>
+        <button type="button" class="btn btn-dark rounded-pill px-4 py-2 fw-bold shadow-sm text-nowrap" data-bs-toggle="modal" data-bs-target="#linkPortofolioModal">
+            <i class="bi bi-plus-circle me-2"></i> Tambahkan Link
+        </button>
+    </div>
+@else
+    <div class="alert alert-light border p-4 rounded-4 mb-5 shadow-sm d-flex flex-column flex-md-row align-items-md-center gap-3">
+        <div class="d-flex align-items-center flex-grow-1" style="min-width: 0;">
+            <i class="bi bi-link-45deg fs-1 me-4 text-dark"></i>
+            <div style="min-width: 0;">
+                <h5 class="fw-bold text-dark mb-1">Link Portofolio</h5>
+                <a href="{{ $user->url_sosmed }}" target="_blank" rel="noopener noreferrer" class="small text-truncate d-block">{{ $user->url_sosmed }}</a>
+            </div>
+        </div>
+        <button type="button" class="btn btn-outline-dark rounded-pill px-4 py-2 fw-bold text-nowrap" data-bs-toggle="modal" data-bs-target="#linkPortofolioModal">
+            <i class="bi bi-pencil-square me-2"></i> Edit Link
+        </button>
     </div>
 @endif
 
@@ -86,7 +114,7 @@
                                         <li><a class="dropdown-item" href="{{ route('mahasiswa.project.edit', $proj->project_id) }}"><i class="bi bi-pencil me-2"></i> Edit</a></li>
                                         <li><hr class="dropdown-divider"></li>
                                         <li>
-                                            <form action="{{ route('mahasiswa.project.destroy', $proj->project_id) }}" method="POST" onsubmit="return confirm('Hapus proyek ini?')">
+                                            <form action="{{ route('mahasiswa.project.destroy', $proj->project_id) }}" method="POST" onsubmit="return confirmSubmit(this, { title: 'Hapus Proyek Ini?', message: 'Proyek yang sudah dihapus tidak dapat dikembalikan.', confirmText: 'Ya, Hapus', icon: 'bi-trash3-fill' })">
                                                 @csrf @method('DELETE')
                                                 <button type="submit" class="dropdown-item text-danger"><i class="bi bi-trash me-2"></i> Hapus</button>
                                             </form>
@@ -125,17 +153,70 @@
             </div>
         @endforeach
     </div>
+
+    <div class="mt-4">
+        {{ $projects->links('pagination::bootstrap-5') }}
+    </div>
 @endif
 
-@if(!$isLocked && $projects->count() > 0)
+@if(!$isLocked && $projects->total() > 0)
     <div class="mt-5 p-4 bg-dark text-white shadow-sm rounded-4 d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3">
         <div>
             <h5 class="fw-bold mb-1">Sudah Selesai Menyusun?</h5>
-            <p class="text-white-50 small mb-0">Pastikan semua data sudah benar sebelum Anda mendaftar ke Topik Dosen.</p>
+            <p class="text-white-50 small mb-0">
+                @if($user->url_sosmed)
+                    Pastikan semua data sudah benar sebelum Anda mendaftar ke Topik Dosen.
+                @else
+                    Lengkapi dulu link portofolio Anda di atas sebelum bisa mendaftar ke Topik Dosen.
+                @endif
+            </p>
         </div>
-        <a href="{{ route('mahasiswa.topik.index') }}" class="btn btn-light btn-sm px-4 py-2 rounded-pill fw-bold text-dark">
-            Cari Topik TA <i class="bi bi-arrow-right ms-1"></i>
-        </a>
+        @if($user->url_sosmed)
+            <a href="{{ route('mahasiswa.topik.index') }}" class="btn btn-light btn-sm px-4 py-2 rounded-pill fw-bold text-dark">
+                Cari Topik TA <i class="bi bi-arrow-right ms-1"></i>
+            </a>
+        @else
+            <button type="button" class="btn btn-light btn-sm px-4 py-2 rounded-pill fw-bold text-dark" data-bs-toggle="modal" data-bs-target="#linkPortofolioModal">
+                Lengkapi Link Portofolio <i class="bi bi-arrow-right ms-1"></i>
+            </button>
+        @endif
     </div>
 @endif
+
+<div class="modal fade" id="linkPortofolioModal" tabindex="-1" aria-labelledby="linkPortofolioModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
+            <form action="{{ route('mahasiswa.profile.update') }}" method="POST">
+                @csrf
+                @method('PUT')
+                <div class="modal-header bg-dark text-white border-0 p-4">
+                    <h5 class="modal-title fw-bold" id="linkPortofolioModalLabel">
+                        <i class="bi bi-link-45deg me-2"></i> {{ $user->url_sosmed ? 'Edit Link Portofolio' : 'Tambahkan Link Portofolio' }}
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <label for="url_sosmed_modal" class="form-label fw-medium small text-muted">Link Portofolio / LinkedIn / Instagram / Google Drive <span class="text-danger">*</span></label>
+                    <input type="url" class="form-control form-control-lg" id="url_sosmed_modal" name="url_sosmed" value="{{ old('url_sosmed', $user->url_sosmed) }}" placeholder="https://..." required autofocus>
+                    <div class="form-text mt-2 small text-muted">Pastikan link dapat diakses publik (tidak private) supaya dosen bisa melihat karya Anda.</div>
+                    @error('url_sosmed') <div class="small text-danger mt-2">{{ $message }}</div> @enderror
+                </div>
+                <div class="modal-footer bg-light border-0 p-3">
+                    <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">Batal</button>
+                    <button type="submit" class="btn btn-dark rounded-pill px-4 fw-bold">Simpan Link</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@error('url_sosmed')
+    @push('scripts')
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            new bootstrap.Modal(document.getElementById('linkPortofolioModal')).show();
+        });
+    </script>
+    @endpush
+@enderror
 @endsection

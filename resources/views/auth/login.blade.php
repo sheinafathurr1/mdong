@@ -153,6 +153,12 @@
 
         <div class="form-panel">
 
+            @if (session('status'))
+                <div class="alert alert-success bg-success-subtle border-0 rounded-3 fw-bold mb-4 text-success">
+                    <i class="bi bi-check-circle-fill me-2"></i> {{ session('status') }}
+                </div>
+            @endif
+
             @if ($errors->any())
                 <div class="alert alert-danger bg-danger-subtle border-0 rounded-3 fw-bold mb-4 text-danger">
                     <i class="bi bi-exclamation-octagon-fill me-2"></i> Username atau password tidak valid.
@@ -220,7 +226,11 @@
                         </button>
                     </div>
 
-                    <div class="d-grid gap-3 mt-5">
+                    <div class="text-end mt-3">
+                        <a href="{{ route('password.request', ['role' => 'mahasiswa']) }}" class="small fw-bold text-muted text-decoration-none">Lupa password?</a>
+                    </div>
+
+                    <div class="d-grid gap-3 mt-4">
                         <button type="submit" class="btn btn-dark btn-login shadow-sm">
                             Masuk ke Portal <i class="bi bi-box-arrow-in-right ms-2"></i>
                         </button>
@@ -256,7 +266,11 @@
                         </button>
                     </div>
 
-                    <div class="d-grid gap-3 mt-5">
+                    <div class="text-end mt-3">
+                        <a href="{{ route('password.request', ['role' => 'dosen']) }}" class="small fw-bold text-muted text-decoration-none">Lupa password?</a>
+                    </div>
+
+                    <div class="d-grid gap-3 mt-4">
                         <button type="submit" class="btn btn-dark btn-login shadow-sm" style="background-color: #1e293b;">
                             Masuk Ruang Dosen <i class="bi bi-box-arrow-in-right ms-2"></i>
                         </button>

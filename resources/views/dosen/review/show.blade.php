@@ -33,10 +33,16 @@
                 <p class="text-muted mb-4">{{ $application->mahasiswa->nim }} — {{ $application->mahasiswa->program_studi }}</p>
                 
                 <div class="d-flex justify-content-center gap-2 mb-3">
-                    <a href="https://wa.me/{{ preg_replace('/[^0-9]/', '', $application->mahasiswa->no_tlp) }}" target="_blank" class="btn btn-outline-success btn-sm rounded-pill px-3 fw-bold">
-                        <i class="bi bi-whatsapp me-1"></i> Hubungi
-                    </a>
-                    
+                    @if($application->mahasiswa->url_sosmed)
+                        <a href="{{ $application->mahasiswa->url_sosmed }}" target="_blank" rel="noopener noreferrer" class="btn btn-outline-primary btn-sm rounded-pill px-3 fw-bold">
+                            <i class="bi bi-link-45deg me-1"></i> Lihat Portofolio
+                        </a>
+                    @else
+                        <button type="button" class="btn btn-outline-secondary btn-sm rounded-pill px-3 fw-bold" disabled title="Mahasiswa belum menambahkan tautan portofolio">
+                            <i class="bi bi-link-45deg me-1"></i> Portofolio Kosong
+                        </button>
+                    @endif
+
                     <button type="button" class="btn btn-outline-dark btn-sm rounded-pill px-3 fw-bold" data-bs-toggle="modal" data-bs-target="#profilModal">
                         <i class="bi bi-person-vcard me-1"></i> Lihat Profil
                     </button>
@@ -52,11 +58,11 @@
                         @method('PUT')
                         
                         <div class="d-grid gap-3">
-                            <button type="submit" name="status" value="APPROVED-PBB1" class="btn btn-dark py-3 rounded-pill fw-bold shadow-sm" onclick="return confirm('Setujui mahasiswa ini menjadi bimbingan Anda? Kuota akan terpotong 1.')">
+                            <button type="submit" name="status" value="APPROVED" class="btn btn-dark py-3 rounded-pill fw-bold shadow-sm" onclick="return confirmSubmit(this, { title: 'Setujui Aplikasi Ini?', message: 'Mahasiswa ini akan resmi menjadi bimbingan Anda dan kuota bimbingan akan terpotong 1.', confirmText: 'Ya, Setujui', confirmClass: 'btn-dark', icon: 'bi-check-circle-fill', iconWrapClass: 'bg-success-subtle text-success' })">
                                 <i class="bi bi-check-circle-fill me-2"></i> Terima Aplikasi
                             </button>
-                            
-                            <button type="submit" name="status" value="REJECTED" class="btn btn-outline-danger py-2 rounded-pill fw-bold bg-white" onclick="return confirm('Tolak aplikasi ini? Mahasiswa akan dapat mendaftar ke dosen lain.')">
+
+                            <button type="submit" name="status" value="REJECTED" class="btn btn-outline-danger py-2 rounded-pill fw-bold bg-white" onclick="return confirmSubmit(this, { title: 'Tolak Aplikasi Ini?', message: 'Mahasiswa akan diberi tahu dan dapat mendaftar ke dosen lain.', confirmText: 'Ya, Tolak', icon: 'bi-x-circle-fill' })">
                                 <i class="bi bi-x-circle me-1"></i> Tolak Aplikasi
                             </button>
                         </div>
@@ -180,7 +186,7 @@
                             <div class="col-12">
                                 <small class="text-muted fw-bold d-block text-uppercase mb-1" style="font-size: 0.7rem;"><i class="bi bi-link-45deg me-1"></i> Tautan Sosmed / LinkedIn</small>
                                 @if($application->mahasiswa->url_sosmed)
-                                    <a href="{{ $application->mahasiswa->url_sosmed }}" target="_blank" class="fw-bold text-primary text-decoration-none">
+                                    <a href="{{ $application->mahasiswa->url_sosmed }}" target="_blank" rel="noopener noreferrer" class="fw-bold text-primary text-decoration-none">
                                         Kunjungi Tautan <i class="bi bi-box-arrow-up-right ms-1" style="font-size: 0.8rem;"></i>
                                     </a>
                                 @else

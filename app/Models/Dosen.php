@@ -20,6 +20,8 @@ class Dosen extends Authenticatable
         'kode',
         'nip',
         'no_tlp',
+        'visual_path',
+        'link_grup', // Link undangan grup chat bimbingan (WhatsApp/Telegram/dll)
         'program_studi',
         'is_admin', // ENUM: 'YES', 'NO'
     ];

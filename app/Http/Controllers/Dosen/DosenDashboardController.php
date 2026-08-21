@@ -16,11 +16,7 @@ class DosenDashboardController extends Controller
         $user = Auth::guard('dosen')->user();
 
         // 1. Cari periode yang benar-benar aktif saat ini
-        $periodeAktif = Periode::where('is_active', true)
-                               ->whereDate('start_date', '<=', now())
-                               ->whereDate('end_date', '>=', now())
-                               ->latest('start_date')
-                               ->first();
+        $periodeAktif = Periode::aktif()->first();
 
         $topik = null;
         $sisaLimit = 0;

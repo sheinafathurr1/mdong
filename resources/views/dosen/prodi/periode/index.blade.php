@@ -80,7 +80,7 @@
             </tr>
         </thead>
         <tbody>
-            @forelse($periodes as $index => $periode)
+            @forelse($periodes as $periode)
                 @php
                     $now = \Carbon\Carbon::now();
                     $start = \Carbon\Carbon::parse($periode->start_date);
@@ -112,7 +112,7 @@
                             </div>
                             <div>
                                 <h6 class="fw-bold text-dark mb-1">{{ $periode->nama_kode }}</h6>
-                                @if($index === 0) 
+                                @if($loop->first && $periodes->onFirstPage())
                                     <span class="badge bg-dark text-white rounded-pill px-2 py-1" style="font-size: 0.6rem;">TERBARU</span>
                                 @else
                                     <span class="text-muted small" style="font-size: 0.75rem;">Riwayat</span>
@@ -151,7 +151,7 @@
                             <button class="btn btn-light btn-icon border shadow-sm" data-bs-toggle="modal" data-bs-target="#modalEditPeriode-{{ $periode->periode_id }}" title="Edit Periode">
                                 <i class="bi bi-pencil-square text-dark"></i>
                             </button>
-                            <form action="{{ route('dosen.prodi.periode.destroy', $periode->periode_id) }}" method="POST" onsubmit="return confirm('Peringatan Ekstrem: Hapus periode ini? Ini dapat merusak data Topik dan Bimbingan yang terhubung.')">
+                            <form action="{{ route('dosen.prodi.periode.destroy', $periode->periode_id) }}" method="POST" onsubmit="return confirmSubmit(this, { title: 'Peringatan Ekstrem!', message: 'Menghapus periode ini dapat merusak data Topik dan Bimbingan yang terhubung. Tindakan ini tidak dapat dibatalkan.', confirmText: 'Ya, Hapus Permanen', icon: 'bi-exclamation-octagon-fill' })">
                                 @csrf @method('DELETE')
                                 <button type="submit" class="btn btn-danger btn-icon shadow-sm bg-opacity-10 text-danger border-0" style="background-color: #fee2e2;" title="Hapus Permanen">
                                     <i class="bi bi-trash3-fill"></i>
@@ -210,6 +210,10 @@
             @endforelse
         </tbody>
     </table>
+</div>
+
+<div class="px-1">
+    {{ $periodes->links('pagination::bootstrap-5') }}
 </div>
 
 <div class="modal fade" id="modalTambahPeriode" tabindex="-1" aria-hidden="true">

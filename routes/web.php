@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\Auth\ForgotPasswordController;
 
 // Import Controller Mahasiswa
 use App\Http\Controllers\Mahasiswa\MahasiswaDashboardController;
@@ -15,10 +16,10 @@ use App\Http\Controllers\Dosen\DosenDashboardController;
 use App\Http\Controllers\Dosen\TopikInterestController;
 use App\Http\Controllers\Dosen\ReviewController;
 use App\Http\Controllers\Dosen\BimbinganController;
+use App\Http\Controllers\Dosen\ProfileController as DosenProfileController;
 
 //Import Controller Prodi
 use App\Http\Controllers\Prodi\PeriodeController;
-use App\Http\Controllers\Prodi\AssignController;
 
 /*
 |--------------------------------------------------------------------------
@@ -35,9 +36,14 @@ Route::get('/', function () {
 // AREA AUTENTIKASI
 // ==========================================
 Route::get('/login', [AuthController::class, 'index'])->name('login');
-Route::post('/login', [AuthController::class, 'authenticate']);
+Route::post('/login', [AuthController::class, 'authenticate'])->middleware('throttle:5,1');
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
+// Lupa Password (mahasiswa & dosen)
+Route::get('/forgot-password', [ForgotPasswordController::class, 'showLinkRequestForm'])->name('password.request');
+Route::post('/forgot-password', [ForgotPasswordController::class, 'sendResetLinkEmail'])->name('password.email')->middleware('throttle:5,1');
+Route::get('/reset-password/{role}/{token}', [ForgotPasswordController::class, 'showResetForm'])->name('password.reset');
+Route::post('/reset-password', [ForgotPasswordController::class, 'reset'])->name('password.update')->middleware('throttle:5,1');
 
 // ==========================================
 // AREA MAHASISWA
@@ -85,6 +91,10 @@ Route::middleware(['role:dosen'])
         // Dashboard Dosen
         Route::get('/dashboard', [DosenDashboardController::class, 'index'])->name('dashboard');
 
+        // Route Profil Dosen
+        Route::get('/profil', [DosenProfileController::class, 'index'])->name('profile.index');
+        Route::put('/profil', [DosenProfileController::class, 'update'])->name('profile.update');
+
         // Route Topik Interest Dosen
         Route::get('/topik-interest', [TopikInterestController::class, 'index'])->name('topik.index');
         Route::get('/topik-interest/buat', [TopikInterestController::class, 'create'])->name('topik.create');
@@ -115,9 +125,6 @@ Route::middleware(['role:dosen'])
                 Route::patch('/periode/{id}/toggle', [PeriodeController::class, 'toggle'])->name('periode.toggle');
                 Route::delete('/periode/{id}', [PeriodeController::class, 'destroy'])->name('periode.destroy');
 
-                // Assign Pembimbing 2
-                Route::get('/assign-pbb2', [AssignController::class, 'index'])->name('assign.index');
-                Route::put('/assign-pbb2/{id}', [AssignController::class, 'update'])->name('assign.update');
         });
 
 });

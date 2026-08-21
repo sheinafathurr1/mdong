@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Mahasiswa;
+namespace App\Http\Controllers\Dosen;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
@@ -12,32 +12,31 @@ class ProfileController extends Controller
     // Menampilkan halaman profil
     public function index()
     {
-        $user = Auth::guard('mahasiswa')->user();
-        return view('mahasiswa.profile', compact('user'));
+        $user = Auth::guard('dosen')->user();
+        return view('dosen.profile', compact('user'));
     }
 
     // Memproses update profil
     public function update(Request $request)
     {
-        $user = Auth::guard('mahasiswa')->user();
+        $user = Auth::guard('dosen')->user();
 
         // Validasi data yang boleh diubah
         $request->validate([
             'no_tlp' => 'nullable|string|max:20',
-            'url_sosmed' => 'nullable|url|max:255',
+            'link_grup' => 'nullable|url|max:255',
             'photo' => 'nullable|image|max:2048',
         ]);
 
-        // Simpan pembaruan ke database
-        // Catatan: Nama, NIM, Kelas, Angkatan, Email biasanya fix dari kampus
-        // Form upload foto hanya mengirim field 'photo', jadi no_tlp/url_sosmed
-        // cuma ditimpa kalau field-nya memang ikut dikirim (dari form kontak).
+        // Catatan: Nama, Username, Email, Kode, NIP, Program Studi biasanya fix dari kampus.
+        // Form upload foto hanya mengirim field 'photo', jadi field lain cuma ditimpa
+        // kalau memang ikut dikirim (dari form info kontak & grup).
         if ($request->has('no_tlp')) {
             $user->no_tlp = $request->no_tlp;
         }
 
-        if ($request->has('url_sosmed')) {
-            $user->url_sosmed = $request->url_sosmed;
+        if ($request->has('link_grup')) {
+            $user->link_grup = $request->link_grup;
         }
 
         if ($request->hasFile('photo')) {
@@ -46,7 +45,7 @@ class ProfileController extends Controller
                 Storage::disk('public')->delete($user->visual_path);
             }
 
-            $user->visual_path = $request->file('photo')->store('profil-mahasiswa', 'public');
+            $user->visual_path = $request->file('photo')->store('profil-dosen', 'public');
         }
 
         $user->save();

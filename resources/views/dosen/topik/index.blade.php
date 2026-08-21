@@ -49,7 +49,7 @@
 @endif
 
 <div class="accordion custom-accordion" id="accordionTopik">
-    @forelse($topiks as $index => $topik)
+    @forelse($topiks as $topik)
         @php
             // Logika pengecekan status periode secara real-time
             $now = \Carbon\Carbon::now();
@@ -143,6 +143,16 @@
                                         <i class="bi bi-exclamation-triangle-fill me-1"></i> Kuota Penuh
                                     </div>
                                 @endif
+
+                                <div class="mt-4 pt-3 border-top w-100">
+                                    <div class="text-muted fw-bold text-uppercase tracking-wide small mb-1" style="font-size: 0.65rem;">Antrean Reservasi</div>
+                                    <div class="fw-bold {{ $isAktif ? 'text-dark' : 'text-secondary' }}">{{ $topik->reservasi_applied }} / {{ $topik->limit_reservasi }}</div>
+                                    @if($isAktif && $topik->reservasi_applied >= $topik->limit_reservasi)
+                                        <div class="mt-2 badge bg-warning text-dark rounded-pill py-2 px-3 shadow-sm">
+                                            <i class="bi bi-hourglass-split me-1"></i> Antrean Penuh
+                                        </div>
+                                    @endif
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -168,5 +178,9 @@
             </div>
         </div>
     @endforelse
+</div>
+
+<div class="mt-4">
+    {{ $topiks->links('pagination::bootstrap-5') }}
 </div>
 @endsection
