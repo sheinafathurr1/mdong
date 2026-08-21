@@ -151,7 +151,7 @@
                             <button class="btn btn-light btn-icon border shadow-sm" data-bs-toggle="modal" data-bs-target="#modalEditPeriode-{{ $periode->periode_id }}" title="Edit Periode">
                                 <i class="bi bi-pencil-square text-dark"></i>
                             </button>
-                            <form action="{{ route('dosen.prodi.periode.destroy', $periode->periode_id) }}" method="POST" onsubmit="return confirm('Peringatan Ekstrem: Hapus periode ini? Ini dapat merusak data Topik dan Bimbingan yang terhubung.')">
+                            <form action="{{ route('dosen.prodi.periode.destroy', $periode->periode_id) }}" method="POST" onsubmit="return confirmSubmit(this, { title: 'Peringatan Ekstrem!', message: 'Menghapus periode ini dapat merusak data Topik dan Bimbingan yang terhubung. Tindakan ini tidak dapat dibatalkan.', confirmText: 'Ya, Hapus Permanen', icon: 'bi-exclamation-octagon-fill' })">
                                 @csrf @method('DELETE')
                                 <button type="submit" class="btn btn-danger btn-icon shadow-sm bg-opacity-10 text-danger border-0" style="background-color: #fee2e2;" title="Hapus Permanen">
                                     <i class="bi bi-trash3-fill"></i>

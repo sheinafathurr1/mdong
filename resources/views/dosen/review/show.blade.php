@@ -58,11 +58,11 @@
                         @method('PUT')
                         
                         <div class="d-grid gap-3">
-                            <button type="submit" name="status" value="APPROVED" class="btn btn-dark py-3 rounded-pill fw-bold shadow-sm" onclick="return confirm('Setujui mahasiswa ini menjadi bimbingan Anda? Kuota akan terpotong 1.')">
+                            <button type="submit" name="status" value="APPROVED" class="btn btn-dark py-3 rounded-pill fw-bold shadow-sm" onclick="return confirmSubmit(this, { title: 'Setujui Aplikasi Ini?', message: 'Mahasiswa ini akan resmi menjadi bimbingan Anda dan kuota bimbingan akan terpotong 1.', confirmText: 'Ya, Setujui', confirmClass: 'btn-dark', icon: 'bi-check-circle-fill', iconWrapClass: 'bg-success-subtle text-success' })">
                                 <i class="bi bi-check-circle-fill me-2"></i> Terima Aplikasi
                             </button>
-                            
-                            <button type="submit" name="status" value="REJECTED" class="btn btn-outline-danger py-2 rounded-pill fw-bold bg-white" onclick="return confirm('Tolak aplikasi ini? Mahasiswa akan dapat mendaftar ke dosen lain.')">
+
+                            <button type="submit" name="status" value="REJECTED" class="btn btn-outline-danger py-2 rounded-pill fw-bold bg-white" onclick="return confirmSubmit(this, { title: 'Tolak Aplikasi Ini?', message: 'Mahasiswa akan diberi tahu dan dapat mendaftar ke dosen lain.', confirmText: 'Ya, Tolak', icon: 'bi-x-circle-fill' })">
                                 <i class="bi bi-x-circle me-1"></i> Tolak Aplikasi
                             </button>
                         </div>

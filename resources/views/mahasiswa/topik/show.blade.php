@@ -87,7 +87,7 @@
                             <i class="bi bi-x-circle-fill me-1"></i> Antrean (kuota reservasi) untuk topik ini sudah penuh. Silakan cari topik lain atau coba lagi nanti.
                         </div>
                     @else
-                        <form action="{{ route('mahasiswa.topik.apply', $topik->topik_id) }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin mendaftar ke topik ini? Data portofolio Anda akan dikirim secara anonim ke dosen pemilik topik.')">
+                        <form action="{{ route('mahasiswa.topik.apply', $topik->topik_id) }}" method="POST" onsubmit="return confirmSubmit(this, { title: 'Daftar ke Topik Ini?', message: 'Data portofolio Anda akan dikirim secara anonim ke dosen pemilik topik.', confirmText: 'Ya, Daftar Sekarang', confirmClass: 'btn-dark', icon: 'bi-send-check-fill', iconWrapClass: 'bg-dark-subtle text-dark' })">
                             @csrf
                             <button type="submit" class="btn btn-dark btn-lg fw-bold rounded-pill px-5 py-3 shadow-lg w-100">
                                 <i class="bi bi-send-check-fill me-2"></i> Apply Topik Ini

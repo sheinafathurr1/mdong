@@ -114,7 +114,7 @@
                                         <li><a class="dropdown-item" href="{{ route('mahasiswa.project.edit', $proj->project_id) }}"><i class="bi bi-pencil me-2"></i> Edit</a></li>
                                         <li><hr class="dropdown-divider"></li>
                                         <li>
-                                            <form action="{{ route('mahasiswa.project.destroy', $proj->project_id) }}" method="POST" onsubmit="return confirm('Hapus proyek ini?')">
+                                            <form action="{{ route('mahasiswa.project.destroy', $proj->project_id) }}" method="POST" onsubmit="return confirmSubmit(this, { title: 'Hapus Proyek Ini?', message: 'Proyek yang sudah dihapus tidak dapat dikembalikan.', confirmText: 'Ya, Hapus', icon: 'bi-trash3-fill' })">
                                                 @csrf @method('DELETE')
                                                 <button type="submit" class="dropdown-item text-danger"><i class="bi bi-trash me-2"></i> Hapus</button>
                                             </form>
