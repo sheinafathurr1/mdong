@@ -62,6 +62,19 @@
             <i class="bi bi-plus-circle me-2"></i> Tambahkan Link
         </button>
     </div>
+@else
+    <div class="alert alert-light border p-4 rounded-4 mb-5 shadow-sm d-flex flex-column flex-md-row align-items-md-center gap-3">
+        <div class="d-flex align-items-center flex-grow-1" style="min-width: 0;">
+            <i class="bi bi-link-45deg fs-1 me-4 text-dark"></i>
+            <div style="min-width: 0;">
+                <h5 class="fw-bold text-dark mb-1">Link Portofolio</h5>
+                <a href="{{ $user->url_sosmed }}" target="_blank" rel="noopener noreferrer" class="small text-truncate d-block">{{ $user->url_sosmed }}</a>
+            </div>
+        </div>
+        <button type="button" class="btn btn-outline-dark rounded-pill px-4 py-2 fw-bold text-nowrap" data-bs-toggle="modal" data-bs-target="#linkPortofolioModal">
+            <i class="bi bi-pencil-square me-2"></i> Edit Link
+        </button>
+    </div>
 @endif
 
 @if($projects->isEmpty())
@@ -178,13 +191,13 @@
                 @method('PUT')
                 <div class="modal-header bg-dark text-white border-0 p-4">
                     <h5 class="modal-title fw-bold" id="linkPortofolioModalLabel">
-                        <i class="bi bi-link-45deg me-2"></i> Tambahkan Link Portofolio
+                        <i class="bi bi-link-45deg me-2"></i> {{ $user->url_sosmed ? 'Edit Link Portofolio' : 'Tambahkan Link Portofolio' }}
                     </h5>
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body p-4">
                     <label for="url_sosmed_modal" class="form-label fw-medium small text-muted">Link Portofolio / LinkedIn / Instagram / Google Drive <span class="text-danger">*</span></label>
-                    <input type="url" class="form-control form-control-lg" id="url_sosmed_modal" name="url_sosmed" value="{{ old('url_sosmed') }}" placeholder="https://..." required autofocus>
+                    <input type="url" class="form-control form-control-lg" id="url_sosmed_modal" name="url_sosmed" value="{{ old('url_sosmed', $user->url_sosmed) }}" placeholder="https://..." required autofocus>
                     <div class="form-text mt-2 small text-muted">Pastikan link dapat diakses publik (tidak private) supaya dosen bisa melihat karya Anda.</div>
                     @error('url_sosmed') <div class="small text-danger mt-2">{{ $message }}</div> @enderror
                 </div>
