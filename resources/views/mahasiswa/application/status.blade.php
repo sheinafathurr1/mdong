@@ -200,20 +200,33 @@
                         @endif
                     </div>
                     
-                    <div class="d-flex align-items-center gap-4 mb-4">
-                        @if($aplikasi->topik->dosen->visual_path)
-                            <img src="{{ asset('storage/' . $aplikasi->topik->dosen->visual_path) }}" alt="Avatar" class="rounded-4 object-fit-cover border shadow-sm" style="width: 75px; height: 75px;">
-                        @else
-                            <div class="bg-dark text-white rounded-4 d-flex align-items-center justify-content-center fw-black shadow-sm" style="width: 75px; height: 75px; font-size: 2rem;">
-                                {{ substr($aplikasi->topik->dosen->nama, 0, 1) }}
+                    @if($status === 'APPROVED')
+                        <div class="d-flex align-items-center gap-4 mb-4">
+                            @if($aplikasi->topik->dosen->visual_path)
+                                <img src="{{ asset('storage/' . $aplikasi->topik->dosen->visual_path) }}" alt="Avatar" class="rounded-4 object-fit-cover border shadow-sm" style="width: 75px; height: 75px;">
+                            @else
+                                <div class="bg-dark text-white rounded-4 d-flex align-items-center justify-content-center fw-black shadow-sm" style="width: 75px; height: 75px; font-size: 2rem;">
+                                    {{ substr($aplikasi->topik->dosen->nama, 0, 1) }}
+                                </div>
+                            @endif
+
+                            <div>
+                                <h5 class="fw-black text-dark mb-1 text-truncate" style="max-width: 250px;" title="{{ $aplikasi->topik->dosen->nama }}">{{ $aplikasi->topik->dosen->nama }}</h5>
+                                <div class="badge bg-light text-secondary border rounded-pill px-3 py-1 fw-bold">{{ $aplikasi->topik->dosen->kode ?? 'Dosen Prodi Kriya' }}</div>
                             </div>
-                        @endif
-                        
-                        <div>
-                            <h5 class="fw-black text-dark mb-1 text-truncate" style="max-width: 250px;" title="{{ $aplikasi->topik->dosen->nama }}">{{ $aplikasi->topik->dosen->nama }}</h5>
-                            <div class="badge bg-light text-secondary border rounded-pill px-3 py-1 fw-bold">{{ $aplikasi->topik->dosen->kode ?? 'Dosen Prodi Kriya' }}</div>
                         </div>
-                    </div>
+                    @else
+                        <div class="d-flex align-items-center gap-4 mb-4">
+                            <div class="bg-light text-muted rounded-4 d-flex align-items-center justify-content-center border shadow-sm" style="width: 75px; height: 75px; font-size: 1.8rem;">
+                                <i class="bi bi-incognito"></i>
+                            </div>
+
+                            <div>
+                                <h5 class="fw-black text-muted mb-1">Dirahasiakan</h5>
+                                <div class="badge bg-light text-secondary border rounded-pill px-3 py-1 fw-bold">Blind Matching &mdash; identitas dosen disembunyikan sampai disetujui</div>
+                            </div>
+                        </div>
+                    @endif
                     
                     <div class="mt-auto">
                         @if($status === 'APPROVED')

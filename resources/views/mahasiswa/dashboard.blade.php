@@ -98,7 +98,7 @@
             <div class="ms-md-auto mt-3 mt-md-0 text-md-end">
                 <div class="small text-muted fw-bold text-uppercase tracking-wide mb-1" style="font-size: 0.65rem;">Dosen Pembimbing</div>
                 <div class="fw-bold text-dark bg-white px-3 py-2 rounded-3 border shadow-sm d-inline-block">
-                    <i class="bi bi-person-workspace me-2 text-success"></i>{{ $latestApp->dosen->nama ?? 'Dosen' }}
+                    <i class="bi bi-person-workspace me-2 text-success"></i>{{ $latestApp->topik->dosen->nama ?? 'Dosen Pembimbing' }}
                 </div>
             </div>
         </div>

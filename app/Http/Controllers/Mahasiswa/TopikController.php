@@ -22,9 +22,9 @@ class TopikController extends Controller
         $topiks = new \Illuminate\Pagination\LengthAwarePaginator([], 0, 9);
 
         if ($periodeAktif) {
-            // Mulai Query Builder
-            $query = TopikInterest::with('dosen')
-                        ->where('periode_id', $periodeAktif->periode_id);
+            // Mulai Query Builder (identitas dosen sengaja TIDAK di-eager-load
+            // di sisi mahasiswa -- blind matching berdasarkan topik, bukan dosen)
+            $query = TopikInterest::where('periode_id', $periodeAktif->periode_id);
 
             // FITUR PENCARIAN (Search HANYA berdasarkan Nama Topik)
             if ($request->filled('search')) {
@@ -55,7 +55,8 @@ class TopikController extends Controller
     // 2. Menampilkan Detail Satu Topik
     public function show($id)
     {
-        $topik = TopikInterest::with('dosen')->findOrFail($id);
+        // Identitas dosen sengaja TIDAK di-eager-load -- blind matching berdasarkan topik
+        $topik = TopikInterest::findOrFail($id);
         $mahasiswaId = Auth::guard('mahasiswa')->id();
         
         // Cek apakah punya aplikasi yang sedang berjalan/disetujui
