@@ -41,14 +41,18 @@
                 </div>
 
                 <div class="row g-4 mb-5 pb-4 border-bottom">
-                    <div class="col-6">
+                    <div class="col-4">
                         <div class="text-muted small fw-bold text-uppercase mb-2">Total Kuota</div>
                         <div class="fs-4 fw-bold text-dark">{{ $topik->limit_bimbingan }} Mahasiswa</div>
                     </div>
-                    <div class="col-6">
+                    <div class="col-4">
                         <div class="text-muted small fw-bold text-uppercase mb-2">Slot Tersedia</div>
                         @php $sisa = $topik->limit_bimbingan - $topik->limit_applied; @endphp
                         <div class="fs-4 fw-bold {{ $sisa > 0 ? 'text-success' : 'text-danger' }}">{{ $sisa }} Mahasiswa</div>
+                    </div>
+                    <div class="col-4">
+                        <div class="text-muted small fw-bold text-uppercase mb-2">Antrean Reservasi</div>
+                        <div class="fs-4 fw-bold {{ $reservasiPenuh ? 'text-danger' : 'text-dark' }}">{{ $topik->reservasi_applied }} / {{ $topik->limit_reservasi }}</div>
                     </div>
                 </div>
 
@@ -72,6 +76,10 @@
                     @elseif($sisa <= 0)
                         <div class="alert alert-danger border-danger rounded-3 p-3 text-danger fw-medium small mb-0">
                             <i class="bi bi-x-circle-fill me-1"></i> Kuota untuk topik ini sudah penuh.
+                        </div>
+                    @elseif($reservasiPenuh)
+                        <div class="alert alert-danger border-danger rounded-3 p-3 text-danger fw-medium small mb-0">
+                            <i class="bi bi-x-circle-fill me-1"></i> Antrean (kuota reservasi) untuk topik ini sudah penuh. Silakan cari topik lain atau coba lagi nanti.
                         </div>
                     @else
                         <form action="{{ route('mahasiswa.topik.apply', $topik->topik_id) }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin mendaftar ke topik ini? Data portofolio Anda akan dikirim secara anonim ke dosen pemilik topik.')">

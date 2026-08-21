@@ -8,7 +8,14 @@ class TopikInterest extends Model
 {
     protected $table = 'topik_interest';
     protected $primaryKey = 'topik_id';
-    protected $fillable = ['dosen_id', 'periode_id', 'nama_topik', 'deskripsi', 'requirement', 'limit_bimbingan', 'limit_applied'];
+    protected $fillable = ['dosen_id', 'periode_id', 'nama_topik', 'deskripsi', 'requirement', 'limit_bimbingan', 'limit_applied', 'reservasi_applied'];
+
+    // Kuota reservasi (antrean) = 2x kuota bimbingan asli, untuk menampung
+    // lebih banyak pendaftar daripada slot bimbingan sebenarnya.
+    public function getLimitReservasiAttribute(): int
+    {
+        return $this->limit_bimbingan * 2;
+    }
 
     public function dosen()
     {

@@ -54,6 +54,10 @@ class ReviewController extends Controller
 
         abort_unless(Auth::guard('dosen')->user()->can('review', $application), 403, 'Anda tidak memiliki akses ke aplikasi ini.');
 
+        if ($application->status !== 'APPLIED') {
+            return back()->with('error', 'Aplikasi ini sudah diproses sebelumnya.');
+        }
+
         // 1. Validasi diubah menjadi APPROVED
         $request->validate([
             'status' => 'required|in:APPROVED,REJECTED'
@@ -61,22 +65,30 @@ class ReviewController extends Controller
 
         $statusBaru = $request->status;
 
-        // 2. Pengecekan IF diubah menjadi APPROVED (dikunci agar tidak race condition saat approval bersamaan)
-        if ($statusBaru === 'APPROVED') {
-            $gagalKarenaPenuh = DB::transaction(function () use ($application) {
-                $topik = TopikInterest::where('topik_id', $application->topik_id)->lockForUpdate()->first();
+        // 2. Dikunci agar tidak race condition saat approval/reject bersamaan
+        $gagalKarenaPenuh = DB::transaction(function () use ($application, $statusBaru) {
+            $topik = TopikInterest::where('topik_id', $application->topik_id)->lockForUpdate()->first();
 
+            if ($statusBaru === 'APPROVED') {
                 if ($topik->limit_applied >= $topik->limit_bimbingan) {
                     return true;
                 }
 
                 $topik->increment('limit_applied');
-                return false;
-            });
-
-            if ($gagalKarenaPenuh) {
-                return back()->with('error', 'Gagal menyetujui! Kuota bimbingan topik ini sudah penuh.');
+            } else {
+                // REJECTED: kembalikan slot reservasi yang terpakai saat apply.
+                // Kuota bimbingan tidak disentuh karena memang belum pernah dikurangi.
+                // Dijaga tidak sampai minus untuk aplikasi lama sebelum kolom ini ada.
+                if ($topik->reservasi_applied > 0) {
+                    $topik->decrement('reservasi_applied');
+                }
             }
+
+            return false;
+        });
+
+        if ($gagalKarenaPenuh) {
+            return back()->with('error', 'Gagal menyetujui! Kuota bimbingan topik ini sudah penuh.');
         }
 
         // Simpan perubahan ke tabel Application

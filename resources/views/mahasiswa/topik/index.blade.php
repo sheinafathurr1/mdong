@@ -104,12 +104,17 @@
                             </p>
                             
                             <div class="d-flex justify-content-between align-items-center pt-3 border-top mt-auto">
-                                @php $sisa = $topik->limit_bimbingan - $topik->limit_applied; @endphp
-                                <span class="badge {{ $sisa > 0 ? 'bg-light text-dark border' : 'bg-danger text-white' }} px-3 py-2 rounded-pill fw-medium shadow-sm">
-                                    @if($sisa > 0)
-                                        <i class="bi bi-people-fill me-1"></i> Sisa {{ $sisa }} Slot
-                                    @else
+                                @php
+                                    $sisa = $topik->limit_bimbingan - $topik->limit_applied;
+                                    $reservasiPenuh = $topik->reservasi_applied >= $topik->limit_reservasi;
+                                @endphp
+                                <span class="badge {{ $sisa > 0 && !$reservasiPenuh ? 'bg-light text-dark border' : 'bg-danger text-white' }} px-3 py-2 rounded-pill fw-medium shadow-sm">
+                                    @if($sisa <= 0)
                                         <i class="bi bi-x-circle-fill me-1"></i> Kuota Penuh
+                                    @elseif($reservasiPenuh)
+                                        <i class="bi bi-hourglass-split me-1"></i> Antrean Penuh
+                                    @else
+                                        <i class="bi bi-people-fill me-1"></i> Sisa {{ $sisa }} Slot
                                     @endif
                                 </span>
                                 <span class="text-dark fw-bold small">Lihat Detail <i class="bi bi-arrow-right ms-1"></i></span>

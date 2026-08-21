@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Mahasiswa;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use App\Models\TopikInterest;
 use App\Models\Periode;
 use App\Models\Application;
@@ -33,8 +34,10 @@ class TopikController extends Controller
 
             // FITUR FILTER (Ketersediaan Kuota)
             if ($request->filled('ketersediaan') && $request->ketersediaan === 'tersedia') {
-                // Membandingkan dua kolom di database: limit_bimbingan > limit_applied
-                $query->whereColumn('limit_bimbingan', '>', 'limit_applied');
+                // Masih bisa didaftar kalau kuota bimbingan asli belum penuh
+                // DAN kuota reservasi (antrean, 2x kuota bimbingan) belum penuh.
+                $query->whereColumn('limit_bimbingan', '>', 'limit_applied')
+                      ->whereRaw('reservasi_applied < limit_bimbingan * 2');
             }
 
             // Eksekusi Query
@@ -69,7 +72,10 @@ class TopikController extends Controller
                                               ->where('status', 'REJECTED')
                                               ->exists();
 
-        return view('mahasiswa.topik.show', compact('topik', 'hasApplication', 'hasPortofolio', 'isRejectedFromThisTopic'));
+        // Kuota reservasi (antrean) penuh, terlepas dari kuota bimbingan masih ada atau tidak
+        $reservasiPenuh = $topik->reservasi_applied >= $topik->limit_reservasi;
+
+        return view('mahasiswa.topik.show', compact('topik', 'hasApplication', 'hasPortofolio', 'isRejectedFromThisTopic', 'reservasiPenuh'));
     }
 
     // 3. Memproses Pendaftaran (Apply) Topik
@@ -108,18 +114,38 @@ class TopikController extends Controller
                                               ->where('topik_id', $id)
                                               ->where('status', 'REJECTED')
                                               ->exists();
-                                              
+
         if ($isRejectedFromThisTopic) {
             return back()->with('error', 'Anda sudah pernah ditolak pada topik ini. Silakan cari topik dari dosen lain.');
         }
 
-        // Buat Aplikasi Baru
-        Application::create([
-            'mahasiswa_id' => $mahasiswaId,
-            'topik_id' => $id,
-            'tanggal_submit' => now(),
-            'status' => 'APPLIED'
-        ]);
+        // Validasi 4: Kuota reservasi (antrean) belum penuh. Yang berkurang saat
+        // apply adalah kuota reservasi (2x kuota bimbingan), BUKAN kuota
+        // bimbingan itu sendiri -- kuota bimbingan baru berkurang saat disetujui
+        // dosen (lihat ReviewController::update). Dikunci agar aman dari race
+        // condition kalau ada beberapa mahasiswa apply bersamaan.
+        $reservasiPenuh = DB::transaction(function () use ($id, $mahasiswaId) {
+            $topik = TopikInterest::where('topik_id', $id)->lockForUpdate()->first();
+
+            if ($topik->reservasi_applied >= $topik->limit_reservasi) {
+                return true;
+            }
+
+            $topik->increment('reservasi_applied');
+
+            Application::create([
+                'mahasiswa_id' => $mahasiswaId,
+                'topik_id' => $id,
+                'tanggal_submit' => now(),
+                'status' => 'APPLIED',
+            ]);
+
+            return false;
+        });
+
+        if ($reservasiPenuh) {
+            return back()->with('error', 'Kuota reservasi (antrean) topik ini sudah penuh.');
+        }
 
         return redirect()->route('mahasiswa.dashboard')
                          ->with('success', 'Aplikasi berhasil dikirim! Silakan tunggu review dari dosen terkait.');
