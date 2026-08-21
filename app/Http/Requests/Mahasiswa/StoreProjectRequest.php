@@ -2,7 +2,9 @@
 
 namespace App\Http\Requests\Mahasiswa;
 
+use App\Models\Project;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class StoreProjectRequest extends FormRequest
 {
@@ -20,11 +22,11 @@ class StoreProjectRequest extends FormRequest
             'tipe_proyek'   => 'required|array',
             'tipe_proyek.*' => 'required|in:Perancangan,Analisa',
             'teknik'        => 'nullable|array',
-            'teknik.*'      => 'nullable|string|max:255',
+            'teknik.*'      => ['nullable', Rule::in(Project::TEKNIK_OPTIONS)],
             'metode'        => 'nullable|array',
-            'metode.*'      => 'nullable|string|max:255',
+            'metode.*'      => ['nullable', Rule::in(Project::SKILL_SET_OPTIONS)],
             'material'      => 'nullable|array',
-            'material.*'    => 'nullable|string|max:255',
+            'material.*'    => ['nullable', Rule::in(Project::MATERIAL_OPTIONS)],
             'narasi'        => 'required|array',
             'narasi.*'      => 'required|string',
         ];

@@ -35,15 +35,30 @@
             <div class="row g-4 mb-4 border-top pt-4">
                 <div class="col-md-4">
                     <label class="form-label fw-bold small text-muted text-uppercase tracking-wider">Teknik</label>
-                    <input type="text" class="form-control bg-light border-0" name="teknik" value="{{ old('teknik', $project->teknik) }}">
+                    <select class="form-select bg-light border-0" name="teknik">
+                        <option value="" {{ old('teknik', $project->teknik) ? '' : 'selected' }}>Pilih Teknik...</option>
+                        @foreach(\App\Models\Project::TEKNIK_OPTIONS as $opsi)
+                            <option value="{{ $opsi }}" {{ old('teknik', $project->teknik) == $opsi ? 'selected' : '' }}>{{ $opsi }}</option>
+                        @endforeach
+                    </select>
                 </div>
                 <div class="col-md-4">
-                    <label class="form-label fw-bold small text-muted text-uppercase tracking-wider">Metode</label>
-                    <input type="text" class="form-control bg-light border-0" name="metode" value="{{ old('metode', $project->metode) }}">
+                    <label class="form-label fw-bold small text-muted text-uppercase tracking-wider">Metode / Skill Set</label>
+                    <select class="form-select bg-light border-0" name="metode">
+                        <option value="" {{ old('metode', $project->metode) ? '' : 'selected' }}>Pilih Skill Set...</option>
+                        @foreach(\App\Models\Project::SKILL_SET_OPTIONS as $opsi)
+                            <option value="{{ $opsi }}" {{ old('metode', $project->metode) == $opsi ? 'selected' : '' }}>{{ $opsi }}</option>
+                        @endforeach
+                    </select>
                 </div>
                 <div class="col-md-4">
                     <label class="form-label fw-bold small text-muted text-uppercase tracking-wider">Material</label>
-                    <input type="text" class="form-control bg-light border-0" name="material" value="{{ old('material', $project->material) }}">
+                    <select class="form-select bg-light border-0" name="material">
+                        <option value="" {{ old('material', $project->material) ? '' : 'selected' }}>Pilih Material...</option>
+                        @foreach(\App\Models\Project::MATERIAL_OPTIONS as $opsi)
+                            <option value="{{ $opsi }}" {{ old('material', $project->material) == $opsi ? 'selected' : '' }}>{{ $opsi }}</option>
+                        @endforeach
+                    </select>
                 </div>
             </div>
 
